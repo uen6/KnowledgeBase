@@ -10,16 +10,15 @@
 
 ```
 KnowledgeBase
-  │
-  ├──── .gitignore
-  │
-  ├──── README
-  │
-  ├──── NoteBook
-  │       │
-  │       └──── xxx.md
-  │
-  └──── CodeSnippet
-          │
-          └──── xxx.db
+  ├── .gitignore
+  ├── README
+  |
+  ├── CodeSnippet
+  │     └── db.json
+  |
+  └── NoteBook
+        ├── xxx.db
+        |
+        └── 不常用
+              └── xxx.md
 ```
