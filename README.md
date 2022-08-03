@@ -11,6 +11,8 @@
 ```
 KnowledgeBase
   │
+  ├──── .gitignore
+  │
   ├──── README
   │
   ├──── NoteBook
