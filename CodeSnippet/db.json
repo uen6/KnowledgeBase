@@ -120,24 +120,5 @@
       "updatedAt": 1659435501248
     }
   ],
-  "tags": [
-    {
-      "name": "android",
-      "id": "_0V4Du7a",
-      "createdAt": 1659367472509,
-      "updatedAt": 1659367472509
-    },
-    {
-      "name": "base",
-      "id": "zF0B4Vr9",
-      "createdAt": 1659426939692,
-      "updatedAt": 1659426939692
-    },
-    {
-      "name": "VerticalSeekBar",
-      "id": "UzoFAat7",
-      "createdAt": 1659427107118,
-      "updatedAt": 1659427107118
-    }
-  ]
+  "tags": []
 }
