@@ -17,7 +17,7 @@ KnowledgeBase
   │     └── db.json
   |
   └── NoteBook
-        ├── xxx.db
+        ├── xxx.md
         |
         └── 不常用
               └── xxx.md
