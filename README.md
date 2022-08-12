@@ -22,3 +22,6 @@ KnowledgeBase
         └── 不常用
               └── xxx.md
 ```
+
+## 环境
+`db.json`文件使用massCode软件加载，`xxx.md`文件使用任意markdown软件可预览
