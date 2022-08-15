@@ -76,6 +76,18 @@ implementation "org.projectlombok:lombok:1.18.12"
 
 ## xml属性参考
 
+### 应用全屏
+
+```xml
+<application
+    ...
+    android:theme="@android:style/Theme.Translucent.NoTitleBar.Fullscreen">
+    <activity android:name=".MainActivity">...</activity>
+</application>
+```
+
+
+
 ### 自定义背景
 
 ```xml
@@ -149,6 +161,39 @@ android:layout_centerVertical="true" //水平垂直居中，适用于RelativeLay
 
 
 ## java代码参考
+
+### 开机广播
+
+```xml
+<!--AndroidManifest.xml权限-->
+
+<uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+
+<receiver android:name=".LaunchReceiver">
+    <intent-filter>
+        <action android:name="android.intent.action.BOOT_COMPLETED" />
+    </intent-filter>
+</receiver>
+```
+
+```java
+public class LaunchReceiver extends BroadcastReceiver {
+    @Override
+    public void onReceive(Context context, Intent intent) {
+        Log.d("LaunchReceiver", "LaunchReceiver start log service");
+
+        if (Intent.ACTION_BOOT_COMPLETED.equals(intent.getAction())) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                context.startForegroundService(new Intent(context, LogService.class));
+            } else {
+                context.startService(new Intent(context, LogService.class));
+            }
+        }
+    }
+}
+```
+
+
 
 ### Handler
 
