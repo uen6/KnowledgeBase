@@ -423,3 +423,9 @@ git log ./ # 该命令显示提交到远程服务器的记录
 ```
 
 使用`git reset --hard commit_id`来恢复本地的提交记录
+
+### windows下git bash中文字符被转义
+
+```
+git config --global core.quotepath false
+```
