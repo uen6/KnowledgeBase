@@ -10,7 +10,7 @@
 | `adb reboot [bootloader|recovery]` | 重启，可增加参数<br />bootloader是重启到Fastboot模式<br />recovery是进入恢复模式 |
 | adb root                           |                                                              |
 | adb disable-verity                 |                                                              |
-|                                    |                                                              |
+| adb unroot                         |                                                              |
 |                                    |                                                              |
 |                                    |                                                              |
 |                                    |                                                              |
@@ -22,33 +22,16 @@
 
 ## 设备连接
 
-| 命令               | 作用                                                       |
-| ------------------ | ---------------------------------------------------------- |
-| `adb devices [-l]` | 查看连接计算机的设备，-l可显示更多信息，多设备时更方便查看 |
-| adb kill-server    | 终止adb服务进程                                            |
-| adb start-server   | 重启adb服务进程                                            |
-| adb -s 设备号      | 当有多个设备时，可指定连接某个设备                         |
-|                    |                                                            |
+| 命令                   | 作用                                   |
+| ---------------------- | -------------------------------------- |
+| `adb devices [-l]`     | 查看连接计算机的设备，-l可显示更多信息 |
+| adb -s 设备号          | 当有多个设备时，可指定连接某个设备     |
+| adb connect ip:port    | 无线adb                                |
+| adb disconnect ip:port | 断开无线adb                            |
+| adb start-server       | 重启adb服务进程                        |
+| adb kill-server        | 终止adb服务进程                        |
 
 
-
-## 获取机器信息
-
-| 命令                                        | 作用            |
-| ------------------------------------------- | --------------- |
-| adb get-serialno                            | 获取序列号      |
-| adb shell  cat /sys/class/net/wlan0/address | 获取机器MAC地址 |
-| adb shell cat /proc/cpuinfo                 | 获取CPU序列号   |
-
-
-
-## 进程操作
-
-| 命令                  | 作用             |
-| --------------------- | ---------------- |
-| adb shell ps          | 查看进程列表     |
-| adb shell ps -x [PID] | 查看指定进程状态 |
-|                       |                  |
 
 
 
@@ -66,30 +49,37 @@
 
 
 
-## 屏幕
+## wm
+
+### 分辨率修改
+
+| 命令                       | 作用                    |
+| -------------------------- | ----------------------- |
+| adb shell wm size 1422x720 | 将分辨率修改为 1422x720 |
+| adb shell wm size reset    | 恢复原分辨率            |
+
+### 屏幕密度修改
+
+| 命令                       | 作用                  |
+| -------------------------- | --------------------- |
+| adb shell wm density 160   | 屏幕密度修改为 160dpi |
+| adb shell wm density reset | 恢复原屏幕密度        |
+
+### 显示区域修改
 
 | 命令                            | 作用                                                         |
-| ------------------------------- | ------------------------------------------------------------ |
-| adb shell wm size 1422x720      | 将分辨率修改为 1422x720                                      |
-| adb shell wm size reset         | 恢复原分辨率                                                 |
-| adb shell wm density 160        | 屏幕密度修改为 160dpi                                        |
-| adb shell wm density reset      | 恢复原屏幕密度                                               |
-| adb shell wm overscan 0,0,0,100 | 四个数字分别表示距离左、上、右、下边缘的留白像素<br />以上命令表示将屏幕底部 100px留白 |
+| ------------------------------- | :----------------------------------------------------------- |
+| adb shell wm overscan 0,0,0,100 | 修改显示区域，四个数字分别表示距离左、上、右、下边缘的留白像素<br />以上命令表示将屏幕底部 100px留白 |
 | adb shell wm overscan reset     | 恢复显示区域                                                 |
-|                                 |                                                              |
 
 
 
+## input
 
+### 硬按键模拟
 
-## 硬按键模拟
-
-```shell
-adb shell input keyevent [key值]
-
-# input后面可使用的参数还有：[text | tap | swipe | draganddrop | press | roll]
-# 在焦点处于某文本框时，可以通过 adb shell input text hello，来输入一串文本
-# 如果需要实现滑动动作，可以通过 adb shell input swipe 起始点x坐标 起始点y坐标 结束点x坐标 结束点y坐标
+```
+input keyevent [key值]
 ```
 
 | key值 | 对应按键 |
@@ -126,7 +116,18 @@ adb shell input keyevent [key值]
 |231|打开语音助手|
 |276|如果没有 wakelock 则让系统休眠|
 
+### 文本输入
 
+在焦点处于某文本框时，可以通过 `adb shell input text hello`，来输入一串文本
+
+### 手势模拟
+
+```
+input [tap | swipe | draganddrop | press | roll]
+```
+
+
+如果需要实现滑动动作，可以设置：`adb shell input swipe 起始点x坐标 起始点y坐标 结束点x坐标 结束点y坐标`
 
 
 
@@ -147,6 +148,41 @@ dumpsys activity services [<packagename>]
 
 
 ## am
+
+| 命令                          | 作用                                                         |
+| ----------------------------- | ------------------------------------------------------------ |
+| start [options] intent        | 启动由 intent 指定的 Activity<br />--start-profiler file：启动性能剖析器并将结果发送至 file<br />-R count：重复启动 Activity `count` 次。在每次重复前，将完成顶层 Activity |
+| startservice [options] intent |                                                              |
+|                               |                                                              |
+|                               |                                                              |
+|                               |                                                              |
+
+### options
+
+| 命令                      | 作用                              |
+| ------------------------- | --------------------------------- |
+| -D                        | 启用调试功能                      |
+| `--start-profiler <file>` | 启动性能剖析器并将结果发送至 file |
+|                           |                                   |
+|                           |                                   |
+|                           |                                   |
+
+
+
+### intent
+
+```
+例：adb shell am start -a android.settings.SETTINGS #打开系统设置页面
+例：adb shell am start -a android.intent.action.DIAL -d tel:10086 #打开拨号页面
+例：adb shell am start -n com.android.mms/.ui.ConversationList #打开短信会话列表
+```
+
+| 命令             | 作用                                                         |
+| ---------------- | ------------------------------------------------------------ |
+| `-n <component>` | 指定带有软件包名称前缀的组件名称以创建显式 intent，<br />如 `com.example.app/.ExampleActivity` |
+| `-a <action>`    | 指定 intent 操作，如 `android.intent.action.VIEW`。<br />只能声明一次 |
+| `-c <category>`  | 指定 intent 类别，如 `android.intent.category.APP_CONTACTS`  |
+| `-d <data_uri>`  | 指定 intent 数据 URI，如 `content://contacts/people/1`。<br />只能声明一次 |
 
 
 
@@ -169,9 +205,10 @@ dumpsys activity services [<packagename>]
 -d				将日志转储到屏幕并退出
 -f <filename>	将日志消息输出写入 <filename>。默认值为 stdout
 --pid=<pid>		仅输出来自给定 PID 的日志
+-g				打印缓冲区的大小
 ```
 
-### 级别
+### 调整级别
 
 ```
 #例：adb logcat "*:W"
@@ -187,7 +224,7 @@ dumpsys activity services [<packagename>]
 | *:F  | 过滤只显示 Fatal 及以上级别                            |
 | *:S  | 过滤只显示 Silent 及以上级别(优先级最高，什么也不输出) |
 
-### 格式化
+### 输出格式化
 
 ```
 -v <format>		控制日志输出格式
@@ -217,7 +254,7 @@ dumpsys activity services [<packagename>]
 | year       | 将年份添加到显示的时间                                 |
 | zone       | 将本地时区添加到显示的时间                             |
 
-### 缓冲区
+### 缓冲区相关
 
 ```
 -b <Buffer>		加载一个可使用的日志缓冲区供查看
@@ -239,17 +276,42 @@ dumpsys activity services [<packagename>]
 
 
 
+## monkey
 
+```
+例：monkey -p your.package.name -v 500 #启动您的应用并向其发送500个伪随机事件
+```
 
+### 常规
 
+| 命令                        | 作用                                                         |
+| --------------------------- | ------------------------------------------------------------ |
+| -v                          | 0（默认值）只提供启动通知、测试完成和最终结果<br />级别 1 提供有关测试在运行时的更多详细信息，例如发送到您的 Activity 的各个事件<br />级别 2 提供更详细的设置信息，例如已选择或未选择用于测试的 Activity |
+| `-s <seed>`                 | 伪随机数生成器的种子值。如果您使用相同的种子值重新运行 Monkey，<br />它将会生成相同的事件序列 |
+| `--throttle <milliseconds>` | 在事件之间插入固定的延迟时间。您可以使用此选项减慢 Monkey 速度。<br />如果未指定，则不延迟，系统会尽快地生成事件 |
+| `-p <allowed-package-name>` | 如果您通过这种方式指定一个或多个软件包，Monkey 将仅允许系统访问这些软件包内的 Activity。如果应用需要访问其他软件包中的 Activity（例如选择联系人），您还需要指定这些软件包。如果未指定任何软件包，Monkey 将允许系统启动所有软件包中的 Activity。要指定多个软件包，请多次使用 -p 选项，每个软件包对应一个 -p 选项 |
 
+### 触摸事件
 
+| 命令                        | 作用                                                         |
+| --------------------------- | ------------------------------------------------------------ |
+| `--pct-touch <percent>`     | 调整轻触事件所占百分比                                       |
+| `--pct-motion <percent>`    | 调整动作事件所占百分比（动作事件包括屏幕上某个位置<br />的按下事件，一系列伪随机动作和一个释放事件） |
+| `--pct-trackball <percent>` | 调整轨迹球事件所占百分比（轨迹球事件包括<br />一个或多个随机动作，有时后跟点击） |
+| `--pct-nav <percent>`       | 调整“基本”导航事件所占百分比（导航事件包括<br />向上/向下/向左/向右，作为方向输入设备的输入） |
+| `--pct-majornav <percent>`  | 调整“主要”导航事件所占百分比（这些导航事件通常会导致<br />界面中的操作，例如 5 方向键的中间按钮、返回键或菜单键） |
+| `--pct-syskeys <percent>`   | 调整“系统”按键事件所占百分比（这些按键通常预留供系统使用，<br />例如“主屏幕”、“返回”、“发起通话”、“结束通话”或“音量控件”） |
+| `--pct-appswitch <percent>` | 调整 Activity 启动次数所占百分比，Monkey 会以随机间隔发起<br />startActivity() 调用，以最大限度地覆盖软件包中的所有 Activity |
+| `--pct-anyevent <percent>`  | 调整其他类型事件所占百分比。这包括所有其他类型的事件，<br />例如按键、设备上的其他不太常用的按钮等等 |
 
+### 调试
 
-
-
-
-
+| 命令                           | 作用                                                         |
+| ------------------------------ | ------------------------------------------------------------ |
+| `--ignore-crashes`             | 通常，当应用崩溃或遇到任何类型的未处理异常时，Monkey 将会停止。<br />如果指定此选项，Monkey 会继续向系统发送事件，直到计数完成为止。 |
+| `--ignore-timeouts`            | 通常，当应用遇到任何类型的超时错误（例如“应用无响应”对话框）时，Monkey 将会停止。<br />如果指定此选项，Monkey 会继续向系统发送事件，直到计数完成为止。 |
+| `--ignore-security-exceptions` | 通常，当应用遇到任何类型的权限错误（例如，如果它尝试启动需要<br />特定权限的 Activity）时，Monkey 将会停止。如果指定此选项，<br />Monkey 会继续向系统发送事件，直到计数完成为止。 |
+| `--kill-process-after-error`   | 通常，当 Monkey 因出错而停止运行时，出现故障的应用将保持运行状态。<br />设置此选项后，它将会指示系统停止发生错误的进程。注意，在正常（成功）<br />完成情况下，已启动的进程不会停止，并且设备仅会处于最终事件之后的最后状态 |
 
 
 
