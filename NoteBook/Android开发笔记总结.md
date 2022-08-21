@@ -14,6 +14,7 @@ implementation 'org.litepal.android:core:2.0.0' //导入开源数据库litepal
 implementation 'com.google.code.gson:gson:2.8.6' //导入Gson
 debugImplementation 'com.amitshekhar.android:debug-db:1.0.6' //导入数据库查看工具
 implementation 'org.jsoup:jsoup:1.14.3' //java爬虫
+debugImplementation 'com.squareup.leakcanary:leakcanary-android:2.7' //内存泄漏检测
 
 //lombok需要的文件
 compileOnly 'org.projectlombok:lombok:1.18.16'
@@ -76,7 +77,7 @@ implementation "org.projectlombok:lombok:1.18.12"
 
 ## xml属性参考
 
-### 应用全屏
+### 全屏无标题栏
 
 ```xml
 <application
@@ -396,9 +397,72 @@ https://blog.csdn.net/Hiking_Tsang/article/details/79698911
 
 ## 参考表汇总
 
+### Intent Flag
+
+| Flag                                | 说明                                                         |
+| ----------------------------------- | ------------------------------------------------------------ |
+| FLAG_ACTIVITY_CLEAR_TASK            | 本flag能造成在新活动启动前，与新活动关联的任务被清空。也就是说，新活动成为新任务的根，旧的活动都被结束了。本flag只能与`FLAG_ACTIVITY_NEW_TASK`联合使用。 |
+| FLAG_ACTIVITY_CLEAR_TOP             | 1. 新活动已在当前任务中时，在新活动上面的活动会被关闭，新活动不会重新启动，只会接收new intent<br />2. 新活动已在任务最上面时：如果启动模式是"multiple" (默认的)，并且没添加`FLAG_ACTIVITY_SINGLE_TOP`，那么活动会被销毁重新创建；如果启动模式是其他的，或者添加了`FLAG_ACTIVITY_SINGLE_TOP`，那么只会调用活动的`onNewIntent()`<br />3. 跟`FLAG_ACTIVITY_NEW_TASK`联合使用效果很好：如果用于启动一个任务中的根活动，会把该任务移到前面并清空至root状态。这特别有用，比如用于从notification manager中启动活动 |
+| FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET | 已废弃。API 21后用`FLAG_ACTIVITY_NEW_DOCUMENT`               |
+| FLAG_ACTIVITY_MULTIPLE_TASK         | 1. 用于创建一个新任务，并启动一个活动放进去； 总是跟`FLAG_ACTIVITY_NEW_DOCUMENT`或者`FLAG_ACTIVITY_NEW_TASK`一起使用； 单独用`FLAG_ACTIVITY_NEW_DOCUMENT`或者`FLAG_ACTIVITY_NEW_TASK`时，会在已存在的任务中寻找匹配的Intent，找不到才会创建一个新任务； 使用了本flag不会寻找匹配的Intent，无条件创建一个新任务<br />2. 用了`FLAG_ACTIVITY_NEW_TASK`就不要用本flag，除非你启动的是应用的launcher。 跟`FLAG_ACTIVITY_NEW_TASK`联合使用能防止把已存在的任务移到前面，会为新活动创建一个新任务，无论已存在的任务中有没有新活动<br />3. 因为默认安卓系统中没有提供可视化的任务管理，所以你不应该使用本flag，除非给用户提供可以回到其他任务的方法<br />4. 单独用本flag而不用`FLAG_ACTIVITY_NEW_DOCUMENT`或者`FLAG_ACTIVITY_NEW_TASK`是无效的 |
+| FLAG_ACTIVITY_NEW_DOCUMENT          | 1. 本flag会给启动的活动开一个新的任务记录。使用了本flag或`documentLaunchMode`属性时，相同活动的多实例会在最近任务列表中产生不同的记录<br />2. 使用本flag比使用`documentLaunchMode`属性更好，因为`documentLaunchMode`属性会跟活动绑定，而flag只在需要时添加<br />3. 注意本flag的默认词义，活动销毁后最近任务列表中的入口不会移除。这跟使用`FLAG_ACTIVITY_NEW_TASK`不一样，后者活动销毁后入口会马上移除。你可以用`FLAG_ACTIVITY_RETAIN_IN_RECENTS`改变这个行为<br />4. 本flag可以跟`FLAG_ACTIVITY_MULTIPLE_TASK`联合使用。单独使用时跟manifest活动中定义`documentLaunchMode="intoExisting"`效果相同，联合使用时跟manifest活动中定义`documentLaunchMode="always"`效果相同。 |
+| **FLAG_ACTIVITY_NEW_TASK**          | 1. 新活动会成为历史栈中的新任务（一组活动）的开始<br />2. 通常用于具有"launcher"行为的活动：让用户完成一系列事情，完全独立于之前的活动<br />3. 如果新活动已存在于一个为它运行的任务中，那么不会启动，只会把该任务移到屏幕最前<br />4. 如果新活动要返回result给启动自己的活动，就不能用这个flag |
+| FLAG_ACTIVITY_NO_ANIMATION          | 本flag会阻止系统展示活动的当前状态到另一个状态之间的转移动画。这并不意味着永远没有动画 -- 如果另一项活动的改变在当前展示的活动启动前发生并且没有使用本flag，那么动画还会展示。当你要进行一系列活动操作，但是用户看到的动画不应该由第一项改变来驱动，而是由下一项。 |
+| FLAG_ACTIVITY_NO_HISTORY            | 1. 新活动不会保留在历史栈中，一旦用户切换到其他页面，新活动会马上销毁<br />2. 旧活动的`onActivityResult()`方法永远不会被触发 |
+| FLAG_ACTIVITY_REORDER_TO_FRONT      | 1. 如果新活动已在任务中，用本flag启动会将它移到任务的历史栈的前面<br />2. 如果用了`FLAG_ACTIVITY_CLEAR_TOP`，本flag就无效 |
+| FLAG_ACTIVITY_RETAIN_IN_RECENTS     | 1. 默认情况下由`FLAG_ACTIVITY_NEW_DOCUMENT`创建的新纪录，用户关闭时（按返回键或其他方式结束）它在最近任务中的入口会被移除。如果你想保留入口，就用本flag<br />2. 接收的活动可以用`autoRemoveFromRecents`属性或者调用`Activity.finishAndRemoveTask()`来覆盖本请求。 |
+| FLAG_ACTIVITY_SINGLE_TOP            | 新活动已存在历史栈的顶端时就不会重新启动                     |
+| FLAG_ACTIVITY_FORWARD_RESULT        | （当前活动由源活动启动）本intent从当前活动启动新活动时，源活动的接收目标会从当前活动转移为新活动。新活动调用setResult的数据会传送给源活动 |
+| FLAG_ACTIVITY_PREVIOUS_IS_TOP       | 本intent从当前活动启动新活动时，当前活动不会被视为顶端活动，不管是决定传intent给顶端还是启动新活动。新活动被当做顶端活动使用，假设当前活动立即销毁了 |
+| FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS  | 新活动不会保存在最近启动的活动列表中                         |
+| FLAG_ACTIVITY_BROUGHT_TO_FRONT      | 本flag一般不由应用代码设置，singleTask模式时系统会给你设置   |
+| FLAG_ACTIVITY_RESET_TASK_IF_NEEDED  | 新活动在新任务中启动或者被放到一个已存在任务的顶端时，会被当做任务的前门来启动。这会导致任何相关性的活动在适当状态下需要拥有这个任务（无论移动活动到它里面或者是移走），或者在需要时简单地重置任务到初始状态 |
+| FLAG_ACTIVITY_LAUNCHED_FROM_HISTORY | 本flag一般不由应用代码设置，活动从历史栈中启动（长按home键）时系统会给你设置 |
+| FLAG_ACTIVITY_NO_USER_ACTION        | 1. 本flag会阻止当前最前面活动的onUserLeaveHint回调，在它被新启动的活动造成paused状态时<br />2. 通常，一个活动在受到用户操作而从前面移走的时候会调用上面的回调。该回调标志着活动生命周期中的一个点，在该点活动会隐藏它想要显示的”直到用户看到“的东西，比如闪烁的LED灯<br />3. 如果一个活动曾经由非用户驱动的事件比如来电或闹钟启动，应该在startActivity中添加本flag，以保证暂停时活动知道用户并没有看到通知 |
+| FLAG_ACTIVITY_TASK_ON_HOME          | 本flag会造成新的启动任务放在当前主页活动任务（如果有的话）的顶端。也就是说，在任务中按返回键总是会回到主页，即使上一个用户看到的活动不是主页。本flag只能与`FLAG_ACTIVITY_NEW_TASK`联合使用 |
+| FLAG_ACTIVITY_LAUNCH_ADJACENT       | 本flag只在分屏多窗口模式下使用。新活动会显示在旧活动旁边。本flag只能跟`FLAG_ACTIVITY_NEW_TASK`联合使用。并且如果你想创建一个已存在活动的新实例，那么要设置`FLAG_ACTIVITY_MULTIPLE_TASK` |
+
+**详情请参考：**https://www.jianshu.com/p/2bdc16cba04f
+
+
+
+### android自带样式
+
+```xml
+例：Android:theme="@android:style/Theme.Dialog" 将一个Activity显示为能话框模式
+```
+
+| 属性                                       | 作用                           |
+| ------------------------------------------ | ------------------------------ |
+| @android:style/Theme.Dialog                | 将一个Activity显示为对话框模式 |
+| @android:style/Theme.NoTitleBar            | 不显示应用程序标题栏           |
+| @android:style/Theme.NoTitleBar.Fullscreen | 不显示应用程序标题栏，并全屏   |
+| Theme.Light                                | 背景为白色                     |
+| Theme.Light.NoTitleBar                     | 白色背景并无标题栏             |
+| Theme.Light.NoTitleBar.Fullscreen          | 白色背景，无标题栏，全屏       |
+| Theme.Black                                | 背景黑色                   |@android:style/Theme.Dialog|将一个Activity显示为能话框模式|
+|@android:style/Theme.NoTitleBar|不显示应用程序标题栏|
+|@android:style/Theme.NoTitleBar.Fullscreen|不显示应用程序标题栏，并全屏|
+|Theme.Light|背景为白色|
+|Theme.Light.NoTitleBar|白色背景并无标题栏|
+|Theme.Light.NoTitleBar.Fullscreen|白色背景，无标题栏，全屏|
+|Theme.Black|背景黑色|
+|Theme.Black.NoTitleBar|黑色背景并无标题栏|
+|Theme.Black.NoTitleBar.Fullscreen|黑色背景，无标题栏，全屏|
+|Theme.Wallpaper|用系统桌面为应用程序背景|
+|Theme.Wallpaper.NoTitleBar|用系统桌面为应用程序背景，且无标题栏|
+|Theme.Wallpaper.NoTitleBar.Fullscreen|用系统桌面为应用程序背景，无标题栏，全屏|
+|Translucent|透明背景|
+|Theme.Translucent.NoTitleBar|透明背景并无标题|
+|Theme.Translucent.NoTitleBar.Fullscreen|透明背景并无标题，全屏|
+|Theme.Panel|面板风格显示|
+|Theme.Light.Panel|平板风格显示|
+
+
+
 ### 活动的四种启动模式
 
-| 字符           | 解释                                                         |
+| 类型           | 作用                                                         |
 | -------------- | ------------------------------------------------------------ |
 | standard       | 默认启动模式，每次启动都会创建该活动的一个新的实例，不管这个活动是否已经存在 |
 | singleTop      | 在启动活动时如果发现该活动已经在栈顶，就直接使用，不创建新的活动实例 |
@@ -611,6 +675,23 @@ android:adjustViewBounds="true" //保证长宽比
 	tools:ignore="ScopedStorage" />
 <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
 ```
+
+**双屏异显**
+
+```xml
+显示系统窗口权限
+<uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW"/>
+在屏幕最顶部显示权限
+<uses-permission android:name="android.permission.SYSTEM_OVERLAY_WINDOW"/>
+```
+
+**监听开机广播**
+
+```xml
+<uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+```
+
+
 
 
 
@@ -958,4 +1039,24 @@ https://github.com/amitshekhariitbhu/Android-Debug-Database
 ### 界面无法实时预览
 
 在`...\app\src\main\res\values\styles.xml`中将`<style>`中的`Theme.AppCompat...`之前加上`Base.`，变成`Base.Theme.AppCompat...`
+
+
+
+### 后台service创建前台activity无效
+
+现象大致为：前台无应用的activity，同时后台的service想使用`startActivity()`创建一个acitivity出来，如果activity刚被关闭没多久，此方法是有效的，但是过一会此方法将不起作用，且无报错，其实问题并不是activity被移出队列或被杀掉，是因为在android 10+上，限制了后台启动Service和Activity的时间。
+
+一般允许Service在被创建后的十秒内启动Activity，这个时候是可以启动成功的，但是十秒后就禁止启动Activity。对于这种情况需要申请悬浮窗权限：`"android.permission.SYSTEM_ALERT_WINDOW`，同时在代码中发起权限请求，由用户手动授权。
+
+```xml
+//AndroidManifest.xml
+<uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW"/>
+```
+
+```java
+//startActivity
+Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+startActivity(intent);
+```
 
