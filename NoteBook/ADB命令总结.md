@@ -6,46 +6,42 @@
 
 | 命令                               | 作用                                                         |
 | ---------------------------------- | ------------------------------------------------------------ |
-| adb remount                        | 将system分区重新挂载为可读写分区                             |
+| `adb remount`                      | 将system分区重新挂载为可读写分区                             |
 | `adb reboot [bootloader|recovery]` | 重启，可增加参数<br />bootloader是重启到Fastboot模式<br />recovery是进入恢复模式 |
-| adb root                           |                                                              |
-| adb disable-verity                 |                                                              |
-| adb unroot                         |                                                              |
+| `adb root`                         |                                                              |
+| `adb unroot`                       |                                                              |
+| `adb disable-verity`               |                                                              |
 |                                    |                                                              |
 |                                    |                                                              |
 |                                    |                                                              |
 |                                    |                                                              |
-
-
 
 
 
 ## 设备连接
 
-| 命令                   | 作用                                   |
-| ---------------------- | -------------------------------------- |
-| `adb devices [-l]`     | 查看连接计算机的设备，-l可显示更多信息 |
-| adb -s 设备号          | 当有多个设备时，可指定连接某个设备     |
-| adb connect ip:port    | 无线adb                                |
-| adb disconnect ip:port | 断开无线adb                            |
-| adb start-server       | 重启adb服务进程                        |
-| adb kill-server        | 终止adb服务进程                        |
-
-
+| 命令                     | 作用                                   |
+| ------------------------ | -------------------------------------- |
+| `adb devices [-l]`       | 查看连接计算机的设备，-l可显示更多信息 |
+| `adb -s 设备号`          | 当有多个设备时，可指定连接某个设备     |
+| `adb connect ip:port`    | 无线adb                                |
+| `adb disconnect ip:port` | 断开无线adb                            |
+| `adb start-server`       | 重启adb服务进程                        |
+| `adb kill-server`        | 终止adb服务进程                        |
 
 
 
 ## 应用管理
 
-| 命令                               | 作用             |
-| ---------------------------------- | ---------------- |
-| adb install [-r] xxx.apk           | 安装指定apk      |
-| adb uninstall [-k] xxx.apk         | 卸载指定apk      |
-| adb pull <手机文件路径> <本机路径> | 从手机中拷贝文件 |
-| adb push <本机文件路径> <手机路径> | 上传文件到手机中 |
-|                                    |                  |
-|                                    |                  |
-|                                    |                  |
+| 命令                                 | 作用             |
+| ------------------------------------ | ---------------- |
+| `adb install [-r] xxx.apk`           | 安装指定apk      |
+| `adb uninstall [-k] xxx.apk`         | 卸载指定apk      |
+| `adb pull <手机文件路径> <本机路径>` | 从手机中拷贝文件 |
+| `adb push <本机文件路径> <手机路径>` | 上传文件到手机中 |
+|                                      |                  |
+|                                      |                  |
+|                                      |                  |
 
 
 
@@ -53,24 +49,24 @@
 
 ### 分辨率修改
 
-| 命令                       | 作用                    |
-| -------------------------- | ----------------------- |
-| adb shell wm size 1422x720 | 将分辨率修改为 1422x720 |
-| adb shell wm size reset    | 恢复原分辨率            |
+| 命令               | 作用                    |
+| ------------------ | ----------------------- |
+| `wm size 1422x720` | 将分辨率修改为 1422x720 |
+| `wm size reset`    | 恢复原分辨率            |
 
 ### 屏幕密度修改
 
-| 命令                       | 作用                  |
-| -------------------------- | --------------------- |
-| adb shell wm density 160   | 屏幕密度修改为 160dpi |
-| adb shell wm density reset | 恢复原屏幕密度        |
+| 命令               | 作用                  |
+| ------------------ | --------------------- |
+| `wm density 160`   | 屏幕密度修改为 160dpi |
+| `wm density reset` | 恢复原屏幕密度        |
 
 ### 显示区域修改
 
-| 命令                            | 作用                                                         |
-| ------------------------------- | :----------------------------------------------------------- |
-| adb shell wm overscan 0,0,0,100 | 修改显示区域，四个数字分别表示距离左、上、右、下边缘的留白像素<br />以上命令表示将屏幕底部 100px留白 |
-| adb shell wm overscan reset     | 恢复显示区域                                                 |
+| 命令                    | 作用                                                         |
+| ----------------------- | :----------------------------------------------------------- |
+| `wm overscan 0,0,0,100` | 修改显示区域，四个数字分别表示距离左、上、右、下边缘的留白像素<br />以上命令表示将屏幕底部 100px留白 |
+| `wm overscan reset`     | 恢复显示区域                                                 |
 
 
 
@@ -134,48 +130,52 @@ input [tap | swipe | draganddrop | press | roll]
 ## dumpsys
 
 ```
-
-
-
 # 查看顶部activity
 dumpsys activity top | grep ACTIVITY
 
 # 查看正在运行的Services
 dumpsys activity services [<packagename>]
-
 ```
 
 
 
-## am
+## am(Activity管理器)
 
-| 命令                          | 作用                                                         |
-| ----------------------------- | ------------------------------------------------------------ |
-| start [options] intent        | 启动由 intent 指定的 Activity<br />--start-profiler file：启动性能剖析器并将结果发送至 file<br />-R count：重复启动 Activity `count` 次。在每次重复前，将完成顶层 Activity |
-| startservice [options] intent |                                                              |
-|                               |                                                              |
-|                               |                                                              |
-|                               |                                                              |
+```
+例：am start -n com.android.mms/.ui.ConversationList #打开短信会话列表
+例：am start -a android.settings.SETTINGS #打开系统设置页面
+例：am start -a android.intent.action.DIAL -d tel:10086 #打开拨号页面
+```
+
+| 命令                            | 作用                                                         |
+| ------------------------------- | ------------------------------------------------------------ |
+| `start [options] intent`        | 启动由`intent `指定的`Activity`                              |
+| `startservice [options] intent` | 启动由`intent `指定的`Service`                               |
+| `broadcast [options] intent`    | 发出广播 intent                                              |
+| `to-uri intent`                 | 以 URI 的形式输出给定的 intent 规范                          |
+| `to-intent-uri intent`          | 以 `intent:` URI 的形式输出给定的 intent 规范                |
+| `kill [options] package`        | 终止与 `package`（应用的软件包名称）关联的所有进程。此命令仅终止可安全终止且不会影响用户体验的进程 |
+| `force-stop package`            | 行停止与`package`（应用的软件包名称）关联的所有进程          |
+| `kill-all`                      | 终止所有后台进程                                             |
+| `profile start process file`    | 启动 `process` 的性能剖析器，将结果写入 `file`               |
+| `profile stop process`          | 停止 `process` 的性能剖析器                                  |
+| `clear-debug-app`               | 清除之前使用 `set-debug-app` 设置的待调试软件包              |
+| `monitor [options]`             | 开始监控崩溃或 ANR<br />`--gdb`：在崩溃/ANR 时，在给定的端口上启动 gdbserv |
 
 ### options
 
-| 命令                      | 作用                              |
-| ------------------------- | --------------------------------- |
-| -D                        | 启用调试功能                      |
-| `--start-profiler <file>` | 启动性能剖析器并将结果发送至 file |
-|                           |                                   |
-|                           |                                   |
-|                           |                                   |
-
-
+| 命令                      | 作用                                                         |
+| ------------------------- | ------------------------------------------------------------ |
+| `-D`                      | 启用调试功能                                                 |
+| `-W`                      | 等待启动完成                                                 |
+| `--start-profiler <file>` | 启动性能剖析器并将结果发送至 file                            |
+| `-P file`                 | 类似于 `--start-profiler`，但当应用进入空闲状态时剖析停止    |
+| `-R count`                | 重复启动 Activity `count` 次。在每次重复前，将完成顶层 Activity |
+| `-S`                      | 在启动 Activity 前，强行停止目标应用                         |
+| `--opengl-trace`          | 启用 OpenGL 函数的跟踪                                       |
+| `--user user_id|current`  | 指定要作为哪个用户运行；如果未指定，则作为当前用户运行       |
 
 ### intent
-
-```
-例：adb shell am start -a android.settings.SETTINGS #打开系统设置页面
-例：adb shell am start -a android.intent.action.DIAL -d tel:10086 #打开拨号页面
-例：adb shell am start -n com.android.mms/.ui.ConversationList #打开短信会话列表
-```
 
 | 命令             | 作用                                                         |
 | ---------------- | ------------------------------------------------------------ |
@@ -186,13 +186,7 @@ dumpsys activity services [<packagename>]
 
 
 
-
-
 ## pm
-
-
-
-
 
 
 
