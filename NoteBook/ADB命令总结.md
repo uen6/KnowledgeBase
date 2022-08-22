@@ -12,9 +12,8 @@
 | `adb unroot`                       |                                                              |
 | `adb disable-verity`               |                                                              |
 |                                    |                                                              |
-|                                    |                                                              |
-|                                    |                                                              |
-|                                    |                                                              |
+
+
 
 
 
@@ -31,6 +30,8 @@
 
 
 
+
+
 ## 应用管理
 
 | 命令                                 | 作用             |
@@ -42,6 +43,8 @@
 |                                      |                  |
 |                                      |                  |
 |                                      |                  |
+
+
 
 
 
@@ -67,6 +70,8 @@
 | ----------------------- | :----------------------------------------------------------- |
 | `wm overscan 0,0,0,100` | 修改显示区域，四个数字分别表示距离左、上、右、下边缘的留白像素<br />以上命令表示将屏幕底部 100px留白 |
 | `wm overscan reset`     | 恢复显示区域                                                 |
+
+
 
 
 
@@ -127,16 +132,6 @@ input [tap | swipe | draganddrop | press | roll]
 
 
 
-## dumpsys
-
-```
-# 查看顶部activity
-dumpsys activity top | grep ACTIVITY
-
-# 查看正在运行的Services
-dumpsys activity services [<packagename>]
-```
-
 
 
 ## am(Activity管理器)
@@ -147,20 +142,20 @@ dumpsys activity services [<packagename>]
 例：am start -a android.intent.action.DIAL -d tel:10086 #打开拨号页面
 ```
 
-| 命令                            | 作用                                                         |
-| ------------------------------- | ------------------------------------------------------------ |
-| `start [options] intent`        | 启动由`intent `指定的`Activity`                              |
-| `startservice [options] intent` | 启动由`intent `指定的`Service`                               |
-| `broadcast [options] intent`    | 发出广播 intent                                              |
-| `to-uri intent`                 | 以 URI 的形式输出给定的 intent 规范                          |
-| `to-intent-uri intent`          | 以 `intent:` URI 的形式输出给定的 intent 规范                |
-| `kill [options] package`        | 终止与 `package`（应用的软件包名称）关联的所有进程。此命令仅终止可安全终止且不会影响用户体验的进程 |
-| `force-stop package`            | 行停止与`package`（应用的软件包名称）关联的所有进程          |
-| `kill-all`                      | 终止所有后台进程                                             |
-| `profile start process file`    | 启动 `process` 的性能剖析器，将结果写入 `file`               |
-| `profile stop process`          | 停止 `process` 的性能剖析器                                  |
-| `clear-debug-app`               | 清除之前使用 `set-debug-app` 设置的待调试软件包              |
-| `monitor [options]`             | 开始监控崩溃或 ANR<br />`--gdb`：在崩溃/ANR 时，在给定的端口上启动 gdbserv |
+| 命令                                | 作用                                                         |
+| ----------------------------------- | ------------------------------------------------------------ |
+| **`start [options] intent`**        | 启动由`intent `指定的`Activity`                              |
+| **`startservice [options] intent`** | 启动由`intent `指定的`Service`                               |
+| **`broadcast [options] intent`**    | 发出广播 intent                                              |
+| `to-uri intent`                     | 以 URI 的形式输出给定的 intent 规范                          |
+| `to-intent-uri intent`              | 以 `intent:` URI 的形式输出给定的 intent 规范                |
+| `kill [options] package`            | 终止与 `package`（应用的软件包名称）关联的所有进程。此命令仅终止可安全终止且不会影响用户体验的进程 |
+| `force-stop package`                | 行停止与`package`（应用的软件包名称）关联的所有进程          |
+| `kill-all`                          | 终止所有后台进程                                             |
+| `profile start process file`        | 启动 `process` 的性能剖析器，将结果写入 `file`               |
+| `profile stop process`              | 停止 `process` 的性能剖析器                                  |
+| `clear-debug-app`                   | 清除之前使用 `set-debug-app` 设置的待调试软件包              |
+| `monitor [options]`                 | 开始监控崩溃或 ANR<br />`--gdb`：在崩溃/ANR 时，在给定的端口上启动 gdbserv |
 
 ### options
 
@@ -177,16 +172,61 @@ dumpsys activity services [<packagename>]
 
 ### intent
 
-| 命令             | 作用                                                         |
-| ---------------- | ------------------------------------------------------------ |
-| `-n <component>` | 指定带有软件包名称前缀的组件名称以创建显式 intent，<br />如 `com.example.app/.ExampleActivity` |
-| `-a <action>`    | 指定 intent 操作，如 `android.intent.action.VIEW`。<br />只能声明一次 |
-| `-c <category>`  | 指定 intent 类别，如 `android.intent.category.APP_CONTACTS`  |
-| `-d <data_uri>`  | 指定 intent 数据 URI，如 `content://contacts/people/1`。<br />只能声明一次 |
+| 命令                 | 作用                                                         |
+| -------------------- | ------------------------------------------------------------ |
+| **`-n <component>`** | 指定带有软件包名称前缀的组件名称以创建显式 intent，<br />如 `com.example.app/.ExampleActivity` |
+| `-a <action>`        | 指定 intent 操作，如 `android.intent.action.VIEW`。<br />只能声明一次 |
+| `-c <category>`      | 指定 intent 类别，如 `android.intent.category.APP_CONTACTS`  |
+| `-d <data_uri>`      | 指定 intent 数据 URI，如 `content://contacts/people/1`。<br />只能声明一次 |
 
 
 
-## pm
+
+
+## pm(软件包管理器)
+
+### 应用
+
+| 命令 | 作用 |
+| ---- | ---- |
+| **`install [options] path`**                  | 将软件包（通过 `path` 指定）安装到系统<br /> `-r`：重新安装现有应用，并保留其数据<br />`-t`：允许安装测试 APK。仅当您运行或调试了应用或者使用了 Android Studio 的 **Build > Build APK** 命令时，Gradle 才会生成测试 APK<br />`-i installer_package_name`：指定安装程序软件包名称<br />`--install-location location`：使用以下某个值设置安装位置：<br />    `0`：使用默认安装位置<br />    `1`：在内部设备存储上安装<br />    `2`：在外部介质上安装<br />`-f`：在内部系统内存上安装软件包<br />`-d`：允许版本代码降级<br />`-g`：授予应用清单中列出的所有权限<br />`--fastdeploy`：通过仅更新已更改的 APK 部分来快速更新安装的软件包<br />`--incremental`：仅安装 APK 中启动应用所需的部分，同时在后台流式传输剩余数据。如要使用此功能，您必须为 APK 签名，创建一个 APK 签名方案 v4 文件，并将此文件放在 APK 所在的目录中。只有部分设备支持此功能。此选项会强制 adb 使用该功能，如果该功能不受支持，则会失败（并提供有关失败原因的详细信息）。附加 --wait 选项，可等到 APK 完全安装完毕后再授予对 APK 的访问权限<br />`--no-incremental` 可阻止 adb 使用此功能 |
+| **`uninstall [options] package`**             | 从系统中移除软件包。具体选项：<br />`-k`：移除软件包后保留数据和缓存目录 |
+| **`list packages [options] <stringName>`**    | 输出所有软件包，或者，仅输出软件包名称包含 `stringName` 中的文本的软件包<br />`-f`：查看它们的关联文件<br />`-d`：进行过滤以仅显示已停用的软件包<br />`-e`：进行过滤以仅显示已启用的软件包<br />`-s`：进行过滤以仅显示系统软件包<br />`-3`：进行过滤以仅显示第三方软件包<br />`-i`：查看软件包的安装程序<br /> `-u`：也包括已卸载的软件包<br />`--user user_id`：要查询的用户空间 |
+| `clear package`                               | 删除与软件包关联的所有数据                                   |
+| `path com.android.xxx`                        | 输出给定包名的 APK 的路径                                    |
+
+
+### 用户
+
+| 命令                                          | 作用                                                         |
+| --------------------------------------------- | ------------------------------------------------------------ |
+| `list users`                                  | 输出系统中的所有用户                                         |
+| `disable-user [options] package_or_component` | 具体选项：`--user user_id`：要停用的用户                     |
+| `create-user user_name`                       | 创建具有给定 `user_name` 的新用户，从而输出该用户的新用户标识符 |
+| `remove-user user_id`                         | 移除具有给定 `user_id` 的用户，从而删除与该用户关联的所有数据 |
+| `get-max-users`                               | 输出设备支持的最大用户数                                     |
+
+### 权限
+
+| 命令                                                | 作用                                                         |
+| --------------------------------------------------- | ------------------------------------------------------------ |
+| `grant package_name permission`                     | 向应用授予权限。在搭载 Android 6.0（API 级别 23）及更高版本的设备上，该权限可以是应用清单中声明的任何权限。在搭载 Android 5.1（API 级别 22）及更低版本的设备上，该权限必须是应用定义的可选权限 |
+| `revoke package_name permission`                    | 从应用撤消权限。在搭载 Android 6.0（API 级别 23）及更高版本的设备上，该权限可以是应用清单中声明的任何权限。在搭载 Android 5.1（API 级别 22）及更低版本的设备上，该权限必须是应用定义的可选权限 |
+| `list permission-groups`                            | 输出所有已知的权限组                                         |
+| `list permissions [options] group`                  | 输出所有已知的权限，或者，仅输出 `group` 中的权限<br />`-g`：按组进行整理<br />`-f`：输出所有信息<br />`-s`：简短摘要<br />`-d`：仅列出危险权限<br />`-u`：仅列出用户将看到的权限 |
+| `set-permission-enforced permission [true | false]` | 指定是否应强制执行指定权限                                   |
+
+### 其他
+
+| 命令                             | 作用                                                         |
+| -------------------------------- | ------------------------------------------------------------ |
+| `list libraries`                 | 输出当前设备支持的所有库                                     |
+| `list features`                  | 输出系统的所有功能                                           |
+| `enable package_or_component`    | 启用给定的软件包或组件（写为“package/class”）                |
+| `disable package_or_component`   | 停用给定的软件包或组件（写为“package/class”）                |
+| `set-install-location location`  | 更改默认安装位置。位置值如下：<br />`0`：自动：让系统决定最合适的位置<br />`1`：内部：在内部设备存储上安装<br />`2`：外部：在外部介质上安装 |
+| `get-install-location`           | 返回当前安装位置。返回值如下：<br />`0 [auto]`：让系统决定最合适的位置<br />`1 [internal]`：在内部设备存储上安装<br />`2 [external]`：在外部介质上安装 |
+| `trim-caches desired_free_space` | 减少缓存文件以达到给定的可用空间                             |
 
 
 
@@ -270,6 +310,8 @@ dumpsys activity services [<packagename>]
 
 
 
+
+
 ## monkey
 
 ```
@@ -309,3 +351,53 @@ dumpsys activity services [<packagename>]
 
 
 
+
+
+## dumpsys
+
+```
+# 查看顶部activity
+dumpsys activity top | grep ACTIVITY
+
+# 查看正在运行的Services
+dumpsys activity services [<packagename>]
+```
+
+
+
+
+
+## 截图、录屏
+
+**截图**
+
+```
+screencap <filename>
+
+例：adb shell screencap /sdcard/screen.png
+   adb pull /sdcard/screen.png
+```
+**录屏**
+
+默认情况下，该实用程序以本机显示分辨率和屏幕方向进行录制，时长不超过三分钟
+
+局限性：
+
+-   音频不与视频文件一起录制
+-   无法在搭载 Wear OS 的设备上录制视频
+-   某些设备可能无法以它们的本机显示分辨率进行录制。如果在录制屏幕时出现问题，请尝试使用较低的屏幕分辨率
+-   不支持在录制时旋转屏幕。如果在录制期间屏幕发生了旋转，则部分屏幕内容在录制时将被切断
+
+```
+screenrecord [options] filename
+参数：
+--size widthxheight	默认值为设备的本机显示屏分辨率；如果不支持，则为 1280x720
+--bit-rate rate		设置视频的视频比特率（以 MB/秒为单位）。默认值为4Mbps
+--time-limit time	设置最大录制时长（以秒为单位）。默认值和最大值均为180（3分钟）
+--rotate			将输出旋转 90 度。此功能处于实验阶段
+--verbose			在命令行屏幕显示日志信息。如果您不设置此选项，则该实用程序在运行时不会显示任何信息
+
+例1：adb shell screenrecord /sdcard/demo.mp4
+    adb pull /sdcard/demo.mp4
+例2：screenrecord --bit-rate 6000000 /sdcard/demo.mp4
+```
