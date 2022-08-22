@@ -2,7 +2,7 @@
 
 
 
-## 配置文件参考
+## 一、配置文件参考
 
 ### build.gradle
 
@@ -75,7 +75,7 @@ implementation "org.projectlombok:lombok:1.18.12"
 
 
 
-## xml属性参考
+## 二、xml属性参考
 
 ### 全屏无标题栏
 
@@ -161,7 +161,7 @@ android:layout_centerVertical="true" //水平垂直居中，适用于RelativeLay
 
 
 
-## java代码参考
+## 三、java代码参考
 
 ### 开机广播
 
@@ -395,7 +395,7 @@ https://blog.csdn.net/Hiking_Tsang/article/details/79698911
 
 
 
-## 参考表汇总
+## 四、参考表汇总
 
 ### Intent Flag
 
@@ -810,16 +810,55 @@ protected void onRestart() {
 
 
 
+### 四大组件
+
+**activity**
+
+一个Activity通常就是一个单独的屏幕（窗口），Activity之间通过Intent进行通信
+
+**service**
+
+service用于在后台完成用户指定的操作。service分为两种：
+
+- started（启动）：当应用程序组件（如activity）调用startService()方法启动服务时，服务处于started状态
+- bound（绑定）：当应用程序组件调用bindService()方法绑定到服务时，服务处于bound状态
+
+startService()与bindService()区别：
+
+- started service（启动服务）是由其他组件调用startService()方法启动的，这导致服务的onStartCommand()方法被调用。**当服务是started状态时，其生命周期与启动它的组件无关，并且可以在后台无限期运行，即使启动服务的组件已经被销毁。**因此，服务需要在完成任务后调用stopSelf()方法停止，或者由其他组件调用stopService()方法停止
+
+- 使用bindService()方法启用服务，调用者与服务绑定在了一起，调用者一旦退出，服务也就终止
+
+**content provider（内容提供器）**
+
+ContentProvider实现数据共享。ContentProvider用于保存和获取数据，并使其对所有应用程序可见。这是不同应用程序间共享数据的唯一方式，因为android没有提供所有应用共同访问的公共存储区
+
+ContentProvider使用URI来唯一标识其数据集，这里的URI以content://作为前缀，表示该数据由ContentProvider来管理
+
+broadcast receiver（广播）
+
+广播接收者的注册有两种方法，分别是程序动态注册和AndroidManifest文件中进行静态注册
+
+动态注册广播接收器特点是当用来注册的Activity关掉后，广播也就失效了。**静态注册无需担忧广播接收器是否被关闭，只要设备是开启状态，广播接收器也是打开着的。**也就是说哪怕app本身未启动，该app订阅的广播在触发时也会对它起作用
+
+**总结：**
+
+4大基本组件都需要注册才能使用，每个Activity、service、Content Provider都需要在AndroidManifest文件中进行配置。**AndroidManifest文件中未进行声明的activity、服务以及内容提供者将不为系统所见**，从而也就不可用
+
+内容提供者的激活：当接收到ContentResolver发出的请求后，内容提供者被激活。而其它三种组件activity、服务和广播接收器被一种叫做intent的异步消息所激活
+
+
+
 ### 六大布局
 
-**LinearLayout 线性布局**
+**LinearLayout（线性布局）**
 
  ```xml
 android:orientation="horizontal" //从左到右
 android:orientation="vertical"  //从上到下
  ```
 
-**RelativeLayout 相对布局**
+**RelativeLayout（相对布局）**
 
 参考其他控件进行布局，默认为父控件
 
@@ -859,7 +898,7 @@ android:orientation="vertical"  //从上到下
     android:layout_marginBottom //离某元素下边缘的距离
     ```
 
-**MyLayout 自定义布局**
+**MyLayout（自定义布局）**
 
 自定义ViewGroup，主要是重写两个方法：
 
@@ -868,11 +907,11 @@ onMeasure() //这个是写自定义容器的大小
 onLayout() //这个是写子元素的布局
  ```
 
-**FrameLayout**
+**FrameLayout（框架布局）**
 
 帧布局（特点是从左上角开始，后面的会覆盖前面的控件）
 
-**TableLayout 表格布局**
+**TableLayout（表格布局）**
 
  写在TableLayout中的属性 
 
@@ -889,7 +928,7 @@ android:layout_column //设置控件在第几列
 android:layout_span //设置控件能跨多少列
  ```
 
-**AbsoluteLayout 绝对布局（官方已经舍弃）**
+**AbsoluteLayout（绝对布局）（官方已经舍弃）**
 
 
 
@@ -922,7 +961,7 @@ android:layout_span //设置控件能跨多少列
 
 
 
-## 库导入和工具使用参考
+## 五、库导入和工具使用参考
 
 ### Litepal配置
 
@@ -1024,7 +1063,7 @@ https://github.com/amitshekhariitbhu/Android-Debug-Database
 
 
 
-## 错误解决相关参考
+## 六、错误解决相关参考
 
 ### Build控制台乱码
 
