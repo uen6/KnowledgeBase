@@ -2,82 +2,11 @@
 
 
 
-## 一、配置文件参考
+## 1. 参考代码汇总
 
-### build.gradle
+### 1.1 样式相关
 
-```json
-implementation 'com.google.android.material:material:1.3.0' //导入material design
-implementation 'com.github.bumptech.glide:glide:4.9.0' //导入图片加载的开源项目
-implementation 'com.android.support:percent:28.0.0' //导入百分比布局
-implementation 'org.litepal.android:core:2.0.0' //导入开源数据库litepal
-implementation 'com.google.code.gson:gson:2.8.6' //导入Gson
-debugImplementation 'com.amitshekhar.android:debug-db:1.0.6' //导入数据库查看工具
-implementation 'org.jsoup:jsoup:1.14.3' //java爬虫
-debugImplementation 'com.squareup.leakcanary:leakcanary-android:2.7' //内存泄漏检测
-
-//lombok需要的文件
-compileOnly 'org.projectlombok:lombok:1.18.16'
-annotationProcessor 'org.projectlombok:lombok:1.18.16'
-implementation "org.projectlombok:lombok:1.18.12"
-```
-
-
-
-### AndroidManifest.xml
-
-```xml
-<activity ...
-	android:launchMode="singleTask" //页面启动模式
-	android:screenOrientation="portrait" //保持竖屏  横屏：landscape
-    android:usesCleartextTraffic="true" //允许使用http
-	...>
-	<intent-filter>
-        <!--去掉页面黄色警告-->
-		<action android:name="android.intent.action.VIEW" />
-	</intent-filter>
-</activity>
-```
-
-
-
-### colors.xml
-
-```xml
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-	<color name="colorPrimary">#7FB5FF</color>
-	<color name="colorPrimaryDark">#2B84FF</color>
-	<color name="colorAccent">#FFAE37</color>
-	
-	<!--自定义颜色-->
-    <color name="myBackground">#F6F6F6</color>
-
-    <color name="myWhite">#FFFFFFFF</color>
-    <color name="myBlack">#3C3C3C</color>
-    <color name="myGray">#D8D5D5</color>
-    <color name="myGrayDark">#C8C8C8</color>
-    <color name="myBlue">#7FB5FF</color>
-    <color name="myBlueDark">#2B84FF</color>
-    <color name="myGreen">#A8E066</color>
-    <color name="myPink">#FF4081</color>
-    <color name="myOrange">#FFAE37</color>
-
-    <color name="myTextGray">#969696</color>
-    <color name="myTextGreen">#41AB5D</color>
-    <color name="myTextBlue">#4292C6</color>
-    <color name="myTextOrange">#EF3B2C</color>
-    <color name="myTextYellow">#FE9929</color>
-</resources>
-```
-
-
-
-
-
-## 二、xml属性参考
-
-### 全屏无标题栏
+#### 全屏无标题栏
 
 ```xml
 <application
@@ -87,9 +16,7 @@ implementation "org.projectlombok:lombok:1.18.12"
 </application>
 ```
 
-
-
-### 自定义背景
+#### 自定义背景
 
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
@@ -111,18 +38,14 @@ implementation "org.projectlombok:lombok:1.18.12"
 </shape>
 ```
 
-
-
-### 隐藏list划到头时的阴影
+#### 隐藏list划到头时的阴影
 
 ```xml
 android:fadingEdge="none"
 android:overScrollMode="never"
 ```
 
-
-
-### 水波纹样式
+#### 水波纹样式
 
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
@@ -139,17 +62,13 @@ android:overScrollMode="never"
 </ripple>
 ```
 
-
-
-### 按钮内英文小写显示
+#### 按钮内英文小写显示
 
 ```xml
 android:textAllCaps="false"
 ```
 
-
-
-### 布局对齐方式
+#### 布局对齐方式
 
 ```xml
 android:orientation="vertical" //将LinearLayout设为纵向布局
@@ -159,11 +78,9 @@ android:layout_centerVertical="true" //水平垂直居中，适用于RelativeLay
 
 
 
+### 1.2 代码相关
 
-
-## 三、java代码参考
-
-### 开机广播
+#### 开机广播
 
 ```xml
 <!--AndroidManifest.xml权限-->
@@ -194,9 +111,7 @@ public class LaunchReceiver extends BroadcastReceiver {
 }
 ```
 
-
-
-### Handler
+#### Handler
 
 **匿名类形式创建**
 
@@ -295,9 +210,7 @@ new Handler().removeCallbacks(Runnable);
 new Handler().removeCallbacksAndMessages(null);
 ```
 
-
-
-### recyclerView
+#### recyclerView
 
 **通用RecyclerView**
 
@@ -354,9 +267,7 @@ notifyItemInserted(int)、notifyItemMoved(int)、notifyItemRemoved(int) //插入
 notifyItemChanged(int, Object) //局部刷新指定的数据
 ```
 
-
-
-### dialog
+#### dialog
 
 ```java
 AlertDialog.Builder dialog = new AlertDialog.Builder(getContext());
@@ -372,9 +283,7 @@ dialog.setNegativeButton("取消", (dialog12, which) -> {
 dialog.show(); //显示消息提示框
 ```
 
-
-
-### 切换到下一页
+#### 切换到下一页
 
 ```java
 @Override
@@ -384,9 +293,7 @@ public void onClick(View view) {
 }
 ```
 
-
-
-### 手机号码正则
+#### 手机号码正则
 
 `^0?(13[0-9]|14[579]|15[012356789]|16[6]|17[0135678]|18[0-9]|19[89])[0-9]{8}$`（截止于2018.06.11）
 https://blog.csdn.net/Hiking_Tsang/article/details/79698911
@@ -395,9 +302,26 @@ https://blog.csdn.net/Hiking_Tsang/article/details/79698911
 
 
 
-## 四、参考表汇总
+## 2. 参考内容汇总
 
-### Intent Flag
+### 2.1 开发参考
+
+#### Context作用域参考
+
+| 功能                     | Application Context | Service Context | Activity Context |
+| ------------------------ | ------------------- | --------------- | ---------------- |
+| **StartActivity**        | **NO1**             | **NO1**         | YES              |
+| **ShowDialog**           | **NO**              | **NO**          | YES              |
+| Layout Inflation         | YES                 | YES             | YES              |
+| BindService\StartService | YES                 | YES             | YES              |
+| 注册和发送广播           | YES                 | YES             | YES              |
+| 加载资源文件             | YES                 | YES             | YES              |
+
+**NO1：**表示`Application`和`Service`可以启动一个`Activity`，但是需要创建一个新的`task`，例如给`Intent`添加一个`FLAG_ACTIVITY_NEW_TASK`标记，该标记的作用就是为当前需要启动的`Activity`创建一个新的`task`任务队列
+
+除了`Activity`可以创建一个`Dialog`，其他都不可以创建`Dialog`。原因是因为在创建`Dialog`的时候会使用到`Context`对象去获取当前主题信息，但是我们知道`Application`和`Service`是继承自`ContextWrapper`，没有实现关于主题的功能，然而`Activity`是继承自`ContextThemeWrapper`，该类是实现了关于主题功能的，因此创建`Dialog`的时候必须依附于`Activity`的`Context`引用
+
+#### Intent Flag
 
 | Flag                                | 说明                                                         |
 | ----------------------------------- | ------------------------------------------------------------ |
@@ -424,92 +348,7 @@ https://blog.csdn.net/Hiking_Tsang/article/details/79698911
 
 **详情请参考：**https://www.jianshu.com/p/2bdc16cba04f
 
-
-
-### android自带样式
-
-```xml
-例：Android:theme="@android:style/Theme.Dialog" 将一个Activity显示为能话框模式
-```
-
-| 属性                                       | 作用                           |
-| ------------------------------------------ | ------------------------------ |
-| @android:style/Theme.Dialog                | 将一个Activity显示为对话框模式 |
-| @android:style/Theme.NoTitleBar            | 不显示应用程序标题栏           |
-| @android:style/Theme.NoTitleBar.Fullscreen | 不显示应用程序标题栏，并全屏   |
-| Theme.Light                                | 背景为白色                     |
-| Theme.Light.NoTitleBar                     | 白色背景并无标题栏             |
-| Theme.Light.NoTitleBar.Fullscreen          | 白色背景，无标题栏，全屏       |
-| Theme.Black                                | 背景黑色                   |@android:style/Theme.Dialog|将一个Activity显示为能话框模式|
-|@android:style/Theme.NoTitleBar|不显示应用程序标题栏|
-|@android:style/Theme.NoTitleBar.Fullscreen|不显示应用程序标题栏，并全屏|
-|Theme.Light|背景为白色|
-|Theme.Light.NoTitleBar|白色背景并无标题栏|
-|Theme.Light.NoTitleBar.Fullscreen|白色背景，无标题栏，全屏|
-|Theme.Black|背景黑色|
-|Theme.Black.NoTitleBar|黑色背景并无标题栏|
-|Theme.Black.NoTitleBar.Fullscreen|黑色背景，无标题栏，全屏|
-|Theme.Wallpaper|用系统桌面为应用程序背景|
-|Theme.Wallpaper.NoTitleBar|用系统桌面为应用程序背景，且无标题栏|
-|Theme.Wallpaper.NoTitleBar.Fullscreen|用系统桌面为应用程序背景，无标题栏，全屏|
-|Translucent|透明背景|
-|Theme.Translucent.NoTitleBar|透明背景并无标题|
-|Theme.Translucent.NoTitleBar.Fullscreen|透明背景并无标题，全屏|
-|Theme.Panel|面板风格显示|
-|Theme.Light.Panel|平板风格显示|
-
-
-
-### 活动的四种启动模式
-
-| 类型           | 作用                                                         |
-| -------------- | ------------------------------------------------------------ |
-| standard       | 默认启动模式，每次启动都会创建该活动的一个新的实例，不管这个活动是否已经存在 |
-| singleTop      | 在启动活动时如果发现该活动已经在栈顶，就直接使用，不创建新的活动实例 |
-| singleTask     | 在启动活动时如果发现该活动在栈中存在，就直接使用，同时让把这个活动之上的活动统统出栈，否则才创建新的活动实例 |
-| singleInstance | 由单独的返回栈来管理这个活动，同时也解决了共享活动实例的问题 |
-
-
-
-### 图片填充方式
-
-```xml
-android:scaleType="fitCenter" //填充方式
-android:adjustViewBounds="true" //保证长宽比
-```
-
-| scaleType属性 | 作用                                                         |
-| ------------- | ------------------------------------------------------------ |
-| center        | 保持原图的大小，显示在ImageView的中心。当原图的size大于ImageView的size，超过部分裁剪处理 |
-| centerCrop    | 以填满整个ImageView为目的，将原图的中心对准ImageView的中心，等比例放大原图，直到填满ImageView为止（指的是ImageView的宽和高都要填满），原图超过ImageView的部分作裁剪处理 |
-| centerInside  | 以原图完全显示为目的，将图片的内容完整居中显示，通过按比例缩小原图的size宽(高)等于或小于ImageView的宽(高)。如果原图的size本身就小于ImageView的size，则原图的size不作任何处理，居中显示在ImageView |
-| matrix        | 不改变原图的大小，从ImageView的左上角开始绘制原图，原图超过ImageView的部分作裁剪处理 |
-| fitCenter     | 把原图按比例扩大或缩小到ImageView的高度，居中显示            |
-| fitEnd        | 把原图按比例扩大(缩小)到ImageView的高度，显示在ImageView的下部分位置 |
-| fitStart      | 把原图按比例扩大(缩小)到ImageView的高度，显示在ImageView的上部分位置 |
-| fitXY         | 把原图按照指定的大小在View中显示，拉伸显示图片，不保持原比例，填满ImageView |
-
-
-
-### drawable state属性参考
-
-| 属性                         | 作用                                                         |
-| ---------------------------- | ------------------------------------------------------------ |
-| android:state_pressed        | 是否按下，如一个按钮触摸或者点击                             |
-| android:state_focused        | 是否取得焦点，比如用户选择了一个文本框                       |
-| android:state_hovered        | 光标是否悬停，通常与focused state相同，它是4.0的新特性       |
-| android:state_selected       | 被选中，它与focus state并不完全一样，如一个list view被选中的时候，它里面的各个子组件可能通过方向键，被选中了 |
-| android:state_checkable      | 组件是否能被check。如：RadioButton是可以被check的            |
-| android:state_checked        | 被checked了，如：一个RadioButton可以被check了                |
-| android:state_enabled        | 能够接受触摸或者点击事件                                     |
-| android:state_activated      | 被激活                                                       |
-| android:state_window_focused | 应用程序是否在前台，当有通知栏被拉下来或者一个对话框弹出的时候应用程序就不在前台了 |
-
-**注意：**如果有多个item，那么程序将自动从上到下进行匹配，最先匹配的将得到应用（不是通过最佳匹配），如果一个item没有任何的状态说明，那么它将可以被任何一个状态匹配
-
-
-
-### 权限参考
+#### 权限参考
 
 **网络权限**
 
@@ -691,11 +530,70 @@ android:adjustViewBounds="true" //保证长宽比
 <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 ```
 
+#### activity的四种启动模式
+
+| 类型           | 作用                                                         |
+| -------------- | ------------------------------------------------------------ |
+| standard       | 默认启动模式，每次启动都会创建该活动的一个新的实例，不管这个活动是否已经存在 |
+| singleTop      | 在启动活动时如果发现该活动已经在栈顶，就直接使用，不创建新的活动实例 |
+| singleTask     | 在启动活动时如果发现该活动在栈中存在，就直接使用，同时让把这个活动之上的活动统统出栈，否则才创建新的活动实例 |
+| singleInstance | 由单独的返回栈来管理这个活动，同时也解决了共享活动实例的问题 |
 
 
 
+### 2.2 样式参考
 
-### tools属性参考
+#### 图片填充方式
+
+```xml
+android:scaleType="fitCenter" //填充方式
+android:adjustViewBounds="true" //保证长宽比
+```
+
+| scaleType属性 | 作用                                                         |
+| ------------- | ------------------------------------------------------------ |
+| center        | 保持原图的大小，显示在ImageView的中心。当原图的size大于ImageView的size，超过部分裁剪处理 |
+| centerCrop    | 以填满整个ImageView为目的，将原图的中心对准ImageView的中心，等比例放大原图，直到填满ImageView为止（指的是ImageView的宽和高都要填满），原图超过ImageView的部分作裁剪处理 |
+| centerInside  | 以原图完全显示为目的，将图片的内容完整居中显示，通过按比例缩小原图的size宽(高)等于或小于ImageView的宽(高)。如果原图的size本身就小于ImageView的size，则原图的size不作任何处理，居中显示在ImageView |
+| matrix        | 不改变原图的大小，从ImageView的左上角开始绘制原图，原图超过ImageView的部分作裁剪处理 |
+| fitCenter     | 把原图按比例扩大或缩小到ImageView的高度，居中显示            |
+| fitEnd        | 把原图按比例扩大(缩小)到ImageView的高度，显示在ImageView的下部分位置 |
+| fitStart      | 把原图按比例扩大(缩小)到ImageView的高度，显示在ImageView的上部分位置 |
+| fitXY         | 把原图按照指定的大小在View中显示，拉伸显示图片，不保持原比例，填满ImageView |
+
+#### android自带样式
+
+```xml
+例：Android:theme="@android:style/Theme.Dialog" 将一个Activity显示为能话框模式
+```
+
+| 属性                                       | 作用                                     |
+| ------------------------------------------ | ---------------------------------------- |
+| @android:style/Theme.Dialog                | 将一个Activity显示为对话框模式           |
+| @android:style/Theme.NoTitleBar            | 不显示应用程序标题栏                     |
+| @android:style/Theme.NoTitleBar.Fullscreen | 不显示应用程序标题栏，并全屏             |
+| Theme.Light                                | 背景为白色                               |
+| Theme.Light.NoTitleBar                     | 白色背景并无标题栏                       |
+| Theme.Light.NoTitleBar.Fullscreen          | 白色背景，无标题栏，全屏                 |
+| Theme.Black                                | 背景黑色                                 |
+| @android:style/Theme.NoTitleBar            | 不显示应用程序标题栏                     |
+| @android:style/Theme.NoTitleBar.Fullscreen | 不显示应用程序标题栏，并全屏             |
+| Theme.Light                                | 背景为白色                               |
+| Theme.Light.NoTitleBar                     | 白色背景并无标题栏                       |
+| Theme.Light.NoTitleBar.Fullscreen          | 白色背景，无标题栏，全屏                 |
+| Theme.Black                                | 背景黑色                                 |
+| Theme.Black.NoTitleBar                     | 黑色背景并无标题栏                       |
+| Theme.Black.NoTitleBar.Fullscreen          | 黑色背景，无标题栏，全屏                 |
+| Theme.Wallpaper                            | 用系统桌面为应用程序背景                 |
+| Theme.Wallpaper.NoTitleBar                 | 用系统桌面为应用程序背景，且无标题栏     |
+| Theme.Wallpaper.NoTitleBar.Fullscreen      | 用系统桌面为应用程序背景，无标题栏，全屏 |
+| Translucent                                | 透明背景                                 |
+| Theme.Translucent.NoTitleBar               | 透明背景并无标题                         |
+| Theme.Translucent.NoTitleBar.Fullscreen    | 透明背景并无标题，全屏                   |
+| Theme.Panel                                | 面板风格显示                             |
+| Theme.Light.Panel                          | 平板风格显示                             |
+
+#### tools属性参考
 
 | UI预览相关属性                       | 作用                                                         |
 | ------------------------------------ | ------------------------------------------------------------ |
@@ -715,9 +613,23 @@ android:adjustViewBounds="true" //保证长宽比
 | tools:targetApi    | 忽略版本警告，例如`tools:targetApi="14"`                    |
 | tools:locale       | 指定默认的资源文件所使用的语言环境，例如`tools:locale="zh"` |
 
+#### drawable state属性参考
 
+| 属性                         | 作用                                                         |
+| ---------------------------- | ------------------------------------------------------------ |
+| android:state_pressed        | 是否按下，如一个按钮触摸或者点击                             |
+| android:state_focused        | 是否取得焦点，比如用户选择了一个文本框                       |
+| android:state_hovered        | 光标是否悬停，通常与focused state相同，它是4.0的新特性       |
+| android:state_selected       | 被选中，它与focus state并不完全一样，如一个list view被选中的时候，它里面的各个子组件可能通过方向键，被选中了 |
+| android:state_checkable      | 组件是否能被check。如：RadioButton是可以被check的            |
+| android:state_checked        | 被checked了，如：一个RadioButton可以被check了                |
+| android:state_enabled        | 能够接受触摸或者点击事件                                     |
+| android:state_activated      | 被激活                                                       |
+| android:state_window_focused | 应用程序是否在前台，当有通知栏被拉下来或者一个对话框弹出的时候应用程序就不在前台了 |
 
-### themes文件的样式名称
+**注意：**如果有多个item，那么程序将自动从上到下进行匹配，最先匹配的将得到应用（不是通过最佳匹配），如果一个item没有任何的状态说明，那么它将可以被任何一个状态匹配
+
+#### themes文件的样式名称
 
 | 样式名称                               | 作用位置                                                     |
 | -------------------------------------- | ------------------------------------------------------------ |
@@ -739,9 +651,7 @@ android:adjustViewBounds="true" //保证长宽比
 | textColorPrimary                       | 主要文字颜色                                                 |
 | textColorSecondary                     | 可选文字颜色                                                 |
 
-
-
-### Android颜色透明度
+#### Android颜色透明度
 
 | 透明度 | 数值 | 透明度 | 数值 |
 | ------ | ---- | ------ | ---- |
@@ -760,57 +670,9 @@ https://blog.csdn.net/hewuzhao/article/details/78821954
 
 
 
-### Activity的七种生命周期
+### 2.3 系统结构
 
-```java
-public static final String TAG = "当前的页面";
-
-@Override
-protected void onCreate() {
-        super.onCreate();
-        Log.d(TAG, "onCreate: 在活动第一次被创建的时候调用");
-}
-
-@Override
-protected void onStart() {
-    super.onStart();
-    Log.d(TAG, "onStart: 在活动由不可见变为可见时调用");
-}
-
-@Override
-protected void onResume() {
-    super.onResume();
-    Log.d(TAG, "onResume: 在活动准备好和用户进行交互的时候调用");
-}
-
-@Override
-protected void onPause() {
-    super.onPause();
-    Log.d(TAG, "onPause: 在系统准备去启动或者恢复另一个活动的时候调用");
-}
-
-@Override
-protected void onStop() {
-    super.onStop();
-    Log.d(TAG, "onStop: 在活动完全不可见的时候调用");
-}
-
-@Override
-protected void onDestroy() {
-    super.onDestroy();
-    Log.d(TAG, "onDestroy: 在活动被销毁之前调用，之后活动的状态将变为销毁状态");
-}
-
-@Override
-protected void onRestart() {
-    super.onRestart();
-    Log.d(TAG, "onRestart: 在活动由停止状态变为运行状态之前调用(活动重启)");
-}
-```
-
-
-
-### 四大组件
+#### 四大组件
 
 **activity**
 
@@ -847,9 +709,7 @@ broadcast receiver（广播）
 
 内容提供者的激活：当接收到ContentResolver发出的请求后，内容提供者被激活。而其它三种组件activity、服务和广播接收器被一种叫做intent的异步消息所激活
 
-
-
-### 六大布局
+#### 六大布局
 
 **LinearLayout（线性布局）**
 
@@ -930,9 +790,55 @@ android:layout_span //设置控件能跨多少列
 
 **AbsoluteLayout（绝对布局）（官方已经舍弃）**
 
+#### Activity的七种生命周期
 
+```java
+public static final String TAG = "当前的页面";
 
-### 文件访问权限字母解析
+@Override
+protected void onCreate() {
+        super.onCreate();
+        Log.d(TAG, "onCreate: 在活动第一次被创建的时候调用");
+}
+
+@Override
+protected void onStart() {
+    super.onStart();
+    Log.d(TAG, "onStart: 在活动由不可见变为可见时调用");
+}
+
+@Override
+protected void onResume() {
+    super.onResume();
+    Log.d(TAG, "onResume: 在活动准备好和用户进行交互的时候调用");
+}
+
+@Override
+protected void onPause() {
+    super.onPause();
+    Log.d(TAG, "onPause: 在系统准备去启动或者恢复另一个活动的时候调用");
+}
+
+@Override
+protected void onStop() {
+    super.onStop();
+    Log.d(TAG, "onStop: 在活动完全不可见的时候调用");
+}
+
+@Override
+protected void onDestroy() {
+    super.onDestroy();
+    Log.d(TAG, "onDestroy: 在活动被销毁之前调用，之后活动的状态将变为销毁状态");
+}
+
+@Override
+protected void onRestart() {
+    super.onRestart();
+    Log.d(TAG, "onRestart: 在活动由停止状态变为运行状态之前调用(活动重启)");
+}
+```
+
+#### 文件访问权限字母解析
 
 `drwxrwxrwx`：一共是10个字符，而表示权限就只有后面的9位，第1位不算，因为第1位代表文件的是当前文件的一种属性，如下：
 
@@ -961,9 +867,78 @@ android:layout_span //设置控件能跨多少列
 
 
 
-## 五、库导入和工具使用参考
+## 3. 环境配置参考
 
-### Litepal配置
+### 3.1 文件常用内容
+
+#### build.gradle
+
+```json
+implementation 'com.google.android.material:material:1.3.0' //导入material design
+implementation 'com.github.bumptech.glide:glide:4.9.0' //导入图片加载的开源项目
+implementation 'com.android.support:percent:28.0.0' //导入百分比布局
+implementation 'org.litepal.android:core:2.0.0' //导入开源数据库litepal
+implementation 'com.google.code.gson:gson:2.8.6' //导入Gson
+debugImplementation 'com.amitshekhar.android:debug-db:1.0.6' //导入数据库查看工具
+implementation 'org.jsoup:jsoup:1.14.3' //java爬虫
+debugImplementation 'com.squareup.leakcanary:leakcanary-android:2.7' //内存泄漏检测
+
+//lombok需要的文件
+compileOnly 'org.projectlombok:lombok:1.18.16'
+annotationProcessor 'org.projectlombok:lombok:1.18.16'
+implementation "org.projectlombok:lombok:1.18.12"
+```
+
+#### AndroidManifest.xml
+
+```xml
+<activity ...
+	android:launchMode="singleTask" //页面启动模式
+	android:screenOrientation="portrait" //保持竖屏  横屏：landscape
+    android:usesCleartextTraffic="true" //允许使用http
+	...>
+	<intent-filter>
+        <!--去掉页面黄色警告-->
+		<action android:name="android.intent.action.VIEW" />
+	</intent-filter>
+</activity>
+```
+
+#### colors.xml
+
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<color name="colorPrimary">#7FB5FF</color>
+	<color name="colorPrimaryDark">#2B84FF</color>
+	<color name="colorAccent">#FFAE37</color>
+	
+	<!--自定义颜色-->
+    <color name="myBackground">#F6F6F6</color>
+
+    <color name="myWhite">#FFFFFFFF</color>
+    <color name="myBlack">#3C3C3C</color>
+    <color name="myGray">#D8D5D5</color>
+    <color name="myGrayDark">#C8C8C8</color>
+    <color name="myBlue">#7FB5FF</color>
+    <color name="myBlueDark">#2B84FF</color>
+    <color name="myGreen">#A8E066</color>
+    <color name="myPink">#FF4081</color>
+    <color name="myOrange">#FFAE37</color>
+
+    <color name="myTextGray">#969696</color>
+    <color name="myTextGreen">#41AB5D</color>
+    <color name="myTextBlue">#4292C6</color>
+    <color name="myTextOrange">#EF3B2C</color>
+    <color name="myTextYellow">#FE9929</color>
+</resources>
+```
+
+
+
+### 3.2 第三方内容配置
+
+#### Litepal配置
 
 在`main`文件中创建`assets`文件（和`java`文件夹平级）
 
@@ -1027,9 +1002,7 @@ UserInfo info = LitePal.findAll(UserInfo.class);
 List<info> queryResult = LitePal.where("username like ?", "aaa").find(username.class);
 ```
 
-
-
-### butterKnife配置
+#### butterKnife配置
 
 > 新版Android Studio中已被弃用，改用新的绑定方式
 
@@ -1042,9 +1015,7 @@ annotationProcessor 'com.jakewharton:butterknife-compiler:10.2.3'
 classpath 'com.jakewharton:butterknife-gradle-plugin:10.2.3'
 ```
 
-
-
-### 数据库查看工具使用指导
+#### 数据库查看工具使用指导
 
 **模拟器：**在Terminal中输入 adb forward tcp:8080 tcp:8080，然后打开http://localhost:8080/
 
@@ -1052,9 +1023,7 @@ classpath 'com.jakewharton:butterknife-gradle-plugin:10.2.3'
 
 https://github.com/amitshekhariitbhu/Android-Debug-Database
 
-
-
-### 反编译命令
+#### 反编译命令
 
 提取apk资源：`java -jar [apktool_2.3.3.jar] d -f [安装包名称.apk] -o [文件夹名称]`
 提取apk源代码：`...\dex2jar-2.0\dex2jar-2.0> [d2j-dex2jar] [classes.dex]`
@@ -1063,9 +1032,9 @@ https://github.com/amitshekhariitbhu/Android-Debug-Database
 
 
 
-## 六、错误解决相关参考
+## 4. 问题修复方案
 
-### Build控制台乱码
+**Build控制台乱码**
 
 工具栏：Help -> Edit Custom VM Options，打开一个`.vmoptions`文件后，添加一行：`-Dfile.encoding=UTF-8`，点击项目的编译按钮（小锤子）和运行按钮，然后重启android studio
 
@@ -1075,13 +1044,13 @@ https://github.com/amitshekhariitbhu/Android-Debug-Database
 
 
 
-### 界面无法实时预览
+**界面无法实时预览**
 
 在`...\app\src\main\res\values\styles.xml`中将`<style>`中的`Theme.AppCompat...`之前加上`Base.`，变成`Base.Theme.AppCompat...`
 
 
 
-### 后台service创建前台activity无效
+**后台service创建前台activity无效**
 
 现象大致为：前台无应用的activity，同时后台的service想使用`startActivity()`创建一个acitivity出来，如果activity刚被关闭没多久，此方法是有效的，但是过一会此方法将不起作用，且无报错，其实问题并不是activity被移出队列或被杀掉，是因为在android 10+上，限制了后台启动Service和Activity的时间。
 
