@@ -192,7 +192,7 @@ input [tap | swipe | draganddrop | press | roll]
 | **`install [options] path`**               | 将软件包（通过 `path` 指定）安装到系统<br /> `-r`：重新安装现有应用，并保留其数据<br />`-t`：允许安装测试 APK。仅当您运行或调试了应用或者使用了 Android Studio 的 **Build > Build APK** 命令时，Gradle 才会生成测试 APK<br />`-i installer_package_name`：指定安装程序软件包名称<br />`--install-location location`：使用以下某个值设置安装位置：<br />    `0`：使用默认安装位置<br />    `1`：在内部设备存储上安装<br />    `2`：在外部介质上安装<br />`-f`：在内部系统内存上安装软件包<br />`-d`：允许版本代码降级<br />`-g`：授予应用清单中列出的所有权限<br />`--fastdeploy`：通过仅更新已更改的 APK 部分来快速更新安装的软件包<br />`--incremental`：仅安装 APK 中启动应用所需的部分，同时在后台流式传输剩余数据。如要使用此功能，您必须为 APK 签名，创建一个 APK 签名方案 v4 文件，并将此文件放在 APK 所在的目录中。只有部分设备支持此功能。此选项会强制 adb 使用该功能，如果该功能不受支持，则会失败（并提供有关失败原因的详细信息）。附加 --wait 选项，可等到 APK 完全安装完毕后再授予对 APK 的访问权限<br />`--no-incremental` 可阻止 adb 使用此功能 |
 | **`uninstall [options] package`**          | 从系统中移除软件包。具体选项：<br />`-k`：移除软件包后保留数据和缓存目录 |
 | **`list packages [options] <stringName>`** | 输出所有软件包，或者，仅输出软件包名称包含 `stringName` 中的文本的软件包<br />`-f`：查看它们的关联文件<br />`-d`：进行过滤以仅显示已停用的软件包<br />`-e`：进行过滤以仅显示已启用的软件包<br />`-s`：进行过滤以仅显示系统软件包<br />`-3`：进行过滤以仅显示第三方软件包<br />`-i`：查看软件包的安装程序<br /> `-u`：也包括已卸载的软件包<br />`--user user_id`：要查询的用户空间 |
-| clear package                              | 删除与软件包关联的所有数据                                   |
+| `clear package`                            | 删除与软件包关联的所有数据                                   |
 | `path com.android.xxx`                     | 输出给定包名的 APK 的路径                                    |
 
 
