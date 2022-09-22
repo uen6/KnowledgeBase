@@ -697,7 +697,7 @@ ContentProvider实现数据共享。ContentProvider用于保存和获取数据�
 
 ContentProvider使用URI来唯一标识其数据集，这里的URI以content://作为前缀，表示该数据由ContentProvider来管理
 
-broadcast receiver（广播）
+**broadcast receiver（广播）**
 
 广播接收者的注册有两种方法，分别是程序动态注册和AndroidManifest文件中进行静态注册
 
