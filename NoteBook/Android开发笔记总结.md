@@ -1028,7 +1028,52 @@ https://github.com/amitshekhariitbhu/Android-Debug-Database
 提取apk资源：`java -jar [apktool_2.3.3.jar] d -f [安装包名称.apk] -o [文件夹名称]`
 提取apk源代码：`...\dex2jar-2.0\dex2jar-2.0> [d2j-dex2jar] [classes.dex]`
 
+#### Bootchart配置和使用
 
+**生成数据和log**
+
+```shell
+adb root
+adb shell
+su #可能需要
+touch /data/bootchart/enabled #创建enabled文件，这是BootChart是否启用的标记文件
+reboot
+```
+
+**压缩数据**
+
+```shell
+adb shell
+cd /data/bootchart/
+# 记得删除标记用的文件，不然下次开机还会记录
+del enabled
+# 压缩路径下的文件（差不多是四个文件）
+tar -zcf bootchart_log.tgz *
+# 将文件拷贝到电脑上
+adb push ...
+```
+
+**编译Bootchart**
+
+> Bootchart源码下载地址：https://sourceforge.net/projects/bootchart/
+
+```shell
+# 安装ant
+sudo apt-get install ant
+# 解压bootchart源码
+tar –jxvf bootchart-0.9.tar.bz2
+
+cd [Bootchart源码根目录下]
+ant
+```
+
+**生成Bootchart图片**
+
+```shell
+java -jar bootchart.jar bootchart_log.taz
+```
+
+**注意：**生成和使用`bootchart.jar`都需要jdk 1.8的环境
 
 
 
