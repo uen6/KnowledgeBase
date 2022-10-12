@@ -129,7 +129,7 @@
         {
           "label": "showActivityToMultipleScreen",
           "language": "java",
-          "value": "/**\r\n * 在扩展屏中创建一个新页面（双屏异显）\r\n *\r\n * @param mContext  activity or application context\r\n * @param mActivity [Jump_Activity_Name].class\r\n * @param <T>       a class type\r\n */\r\n<T> void showActivityToMultipleScreen(Context mContext, Class<T> mActivity) {\r\n    DisplayManager displayManager = (DisplayManager) getSystemService(Context.DISPLAY_SERVICE);\r\n    Display[] displays = displayManager.getDisplays(); //获取所有屏幕\r\n    \r\n    if (displays.length > 1 && Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {\r\n        Intent intent = new Intent(mContext, mActivity);\r\n        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_MULTIPLE_TASK);\r\n        ActivityOptions options = ActivityOptions.makeBasic();\r\n        options.setLaunchDisplayId(displays[1].getDisplayId()); //setLaunchDisplayId需要在android 8.0及以上使用\r\n        startActivity(intent, options.toBundle());\r\n    }\r\n}"
+          "value": "/**\r\n * 在扩展屏中创建一个新页面（双屏异显）\r\n *\r\n * @param mContext  activity or application context\r\n */\r\npublic void showActivityToMultipleScreen(Context mContext) {\r\n    DisplayManager displayManager = (DisplayManager) getSystemService(Context.DISPLAY_SERVICE);\r\n    Display[] displays = displayManager.getDisplays(); //获取所有屏幕\r\n    Log.d(TAG, \"displays length: \" + displays.length);\r\n    if (displays.length > 1 && Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {\r\n        MyPresentation myPresentation = new MyPresentation(mContext, displays[1]);\r\n        myPresentation.show();\r\n    }\r\n}\r\n\r\n\r\n\r\n/**\r\n * Presentation类，需要新创一个java文件重新写 \r\n */\r\npublic class MyPresentation extends Presentation {\r\n    private final String TAG = this.getClass().getSimpleName();\r\n\r\n    private final Context context;\r\n    private final Display display;\r\n\r\n\r\n    public MyPresentation(Context outerContext, Display display) {\r\n        super(outerContext, display);\r\n        this.context = outerContext;\r\n        this.display = display;\r\n    }\r\n\r\n    @Override\r\n    protected void onCreate(Bundle savedInstanceState) {\r\n        super.onCreate(savedInstanceState);\r\n        setContentView(R.layout.layout_presentation);\r\n        Log.d(TAG, \"onCreate: MyPresentation\");\r\n    }\r\n}"
         },
         {
           "label": "createNotificationChannel",
@@ -144,7 +144,7 @@
       ],
       "id": "HsJpzGes",
       "createdAt": 1659367449128,
-      "updatedAt": 1663297473772
+      "updatedAt": 1665574812518
     },
     {
       "isDeleted": false,
@@ -162,7 +162,7 @@
       ],
       "id": "BszPKY2C",
       "createdAt": 1659367456523,
-      "updatedAt": 1659668129778
+      "updatedAt": 1665570575207
     }
   ],
   "tags": []
