@@ -1113,3 +1113,8 @@ intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 startActivity(intent);
 ```
 
+
+
+**android模拟器获得root权限**
+
+模拟器默认是不允许对系统文件进行修改的，即使使用``adb root`或者`su`命令也无效，此时需要在`Sdk\emulator\`文件夹中运行cmd，使用`emulator -avd [模拟器名称] -writable-system`命令启动模拟器（使用`emulator -list-avds`可查看所有模拟的设备名称）
