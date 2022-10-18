@@ -17,10 +17,10 @@ KnowledgeBase
   │     └── db.json
   |
   └── NoteBook
-        ├── xxx.md
-        |
-        └── 不常用
-              └── xxx.md
+        ├── Android
+        ├── Python
+        ├── Windows
+        └── ...
 ```
 
 ## 环境
