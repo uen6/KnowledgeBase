@@ -321,6 +321,37 @@ https://blog.csdn.net/Hiking_Tsang/article/details/79698911
 
 除了`Activity`可以创建一个`Dialog`，其他都不可以创建`Dialog`。原因是因为在创建`Dialog`的时候会使用到`Context`对象去获取当前主题信息，但是我们知道`Application`和`Service`是继承自`ContextWrapper`，没有实现关于主题的功能，然而`Activity`是继承自`ContextThemeWrapper`，该类是实现了关于主题功能的，因此创建`Dialog`的时候必须依附于`Activity`的`Context`引用
 
+#### SystemUI Flag
+
+```java
+getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_FULLSCREEN);
+```
+
+| Flag                                  | 说明                                                         |
+| ------------------------------------- | ------------------------------------------------------------ |
+| SYSTEM_UI_FLAG_HIDE_NAVIGATION        | 作用是隐藏系统NavigationBar，但是用户的任何交互，都会导致此Flag被系统清除，进而导航栏自动重新显示 |
+| SYSTEM_UI_FLAG_FULLSCREEN             | 作用是隐藏StatusBar，此Flag一般用在暂时需要全屏的情形（如：阅读应用，全屏视频等），以便让用户的注意力暂时集中在内容上，而如果只是简单的需要一直停留在全屏状态（如：游戏应用），使用WindowManager.LayoutParams.FLAG_FULLSCREEN则是更好的选择。此Flag会因为各种的交互（如：跳转到其他应用,下拉StatusBar，弹出键盘）的发送而被系统清除 |
+| SYSTEM_UI_FLAG_IMMERSIVE              | 避免某些用户交互造成系统自动清除全屏状态，此标识只有配合View.SYSTEM_UI_FLAG_HIDE_NAVIGATION才有作用 |
+| SYSTEM_UI_FLAG_IMMERSIVE_STICKY       | 避免某些用户交互造成系统自动清除全屏状态。同时Activity的部分内容也因此被StatusBar覆盖遮挡 |
+| SYSTEM_UI_FLAG_HIDE_NAVIGATION        | 隐藏导航栏，只有用户的第四种操作会导致状态栏或导航栏的隐藏状态被系统自动清除，此Flag只有配合SYSTEM_UI_FLAG_FULLSCREEN和SYSTEM_UI_FLAG_HIDE_NAVIGATION使用时才会起作用 |
+| SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION | 在不隐藏导航栏的情况下，将Activity的显示范围扩展到导航栏底部，同时Activity的部分内容也因此被NavigationBar覆盖遮挡。<br />当使用此Flag时，设置fitSystemWindow=true的view，会被系统自动添加大小为NavigationBar高度相同的paddingBottom<br />当window设置WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION时，此Flag会被系统会自动添加 |
+| SYSTEM_UI_FLAG_LAYOUT_STABLE          | 稳定布局。当StatusBar和NavigationBar动态显示和隐藏时，系统为fitSystemWindow=true的view设置的padding大小都不会变化，所以view的内容的位置也不会发生移动<br />此属性和其他多个属性都存在关联效果，使用时请查阅相关文档 |
+
+**详情参考：**https://www.jianshu.com/p/e6656707f56c
+
+#### WindowManager Flag
+
+```java
+WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS
+```
+
+| Flag                              | 说明                                                         |
+| --------------------------------- | ------------------------------------------------------------ |
+| FLAG_TRANSLUCENT_STATUS           | 半透明StatusBar，并且不会因用户交互而被清除，设置了此flag，系统会自动设置View.SYSTEM_UI_FLAG_LAYOUT_STABLE和View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN |
+| FLAG_FULLSCREEN                   | 用于隐藏StatusBar，使用此flag，系统会自动忽略输入法的SOFT_INPUT_ADJUST_RESIZE的特性 |
+| FLAG_TRANSLUCENT_NAVIGATION       | 半透明NavigationBar，并且不会因用户交互而被清除。设置了此flag，系统会自动设置View.SYSTEM_UI_FLAG_LAYOUT_STABLE和View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION |
+| FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS | 用于未StatusBar和NavigationBar设置背景颜色。原理：将StatusBar和NavigationBar设置为透明背景，并且将StatusBar和NavigationBar所在空间设置为Window.getStatusBarColor() 和Window.getNavigationBarColor()方法获得的颜色 |
+
 #### Intent Flag
 
 | Flag                                | 说明                                                         |
