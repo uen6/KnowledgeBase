@@ -437,3 +437,16 @@ git log ./ # 该命令显示提交到远程服务器的记录
 ```
 git config --global core.quotepath false
 ```
+
+### git提示LF和CRLF冲突
+
+```bash
+# 提交时转换为LF，检出时转换为CRLF
+git config --global core.autocrlf true
+
+# 提交检出均不转换(不建议使用，如果在linux下也提交过此项目，
+# 可能会导致文本中即存在LF又存在CRLF，除非你确认此项目只会在
+# windows下使用)
+git config --global core.autocrlf false
+```
+
