@@ -1130,7 +1130,7 @@ java -jar bootchart.jar bootchart_log.taz
 
 现象大致为：前台无应用的activity，同时后台的service想使用`startActivity()`创建一个acitivity出来，如果activity刚被关闭没多久，此方法是有效的，但是过一会此方法将不起作用，且无报错，其实问题并不是activity被移出队列或被杀掉，是因为在android 10+上，限制了后台启动Service和Activity的时间。
 
-一般允许Service在被创建后的十秒内启动Activity，这个时候是可以启动成功的，但是十秒后就禁止启动Activity。对于这种情况需要申请悬浮窗权限：`"android.permission.SYSTEM_ALERT_WINDOW`，同时在代码中发起权限请求，由用户手动授权。
+一般允许Service在被创建后的十秒内启动Activity，这个时候是可以启动成功的，但是十秒后就禁止启动Activity。对于这种情况需要申请悬浮窗权限：`android.permission.SYSTEM_ALERT_WINDOW`，同时在代码中发起权限请求，由用户手动授权。
 
 ```xml
 //AndroidManifest.xml
@@ -1148,4 +1148,4 @@ startActivity(intent);
 
 **android模拟器获得root权限**
 
-模拟器默认是不允许对系统文件进行修改的，即使使用``adb root`或者`su`命令也无效，此时需要在`Sdk\emulator\`文件夹中运行cmd，使用`emulator -avd [模拟器名称] -writable-system`命令启动模拟器（使用`emulator -list-avds`可查看所有模拟的设备名称）
+模拟器默认是不允许对系统文件进行修改的，即使使用`adb root`或者`su`命令也无效，此时需要在`Sdk\emulator\`文件夹中运行cmd，使用`emulator -avd [模拟器名称] -writable-system`命令启动模拟器（使用`emulator -list-avds`可查看所有模拟的设备名称）
