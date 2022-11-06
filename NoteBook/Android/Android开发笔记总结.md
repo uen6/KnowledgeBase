@@ -306,6 +306,22 @@ https://blog.csdn.net/Hiking_Tsang/article/details/79698911
 
 ### 2.1 开发参考
 
+#### 新版logcat过滤语法
+
+```
+例：package:mine level:DEBUG
+```
+
+| 语法                                                        | 作用                           |
+| ----------------------------------------------------------- | ------------------------------ |
+| package:mine                                                | 默认语法，只显示当前的应用     |
+| package:package-ID                                          | 根据包名过滤                   |
+| level:[VERBOSE \| INFO \| ASSERT \|DEBUG \| WARN \| ERROR ] | 根据日志等级进行过滤           |
+| tag:xxx                                                     | 根据tag进行过滤                |
+| -tag:exclude-this-tag                                       | 在前面加了个`-`，排除指定的TAG |
+| tag~:regex-tag                                              | 在后面加了个`~`，支持正则过滤  |
+| -tag~:exclude-this-regex-tag                                | 支持正则过滤排除指定TAG        |
+
 #### Context作用域参考
 
 | 功能                     | Application Context | Service Context | Activity Context |
