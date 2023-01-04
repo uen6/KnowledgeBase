@@ -1093,7 +1093,7 @@ reboot
 adb shell
 cd /data/bootchart/
 # 记得删除标记用的文件，不然下次开机还会记录
-del enabled
+rm enabled
 # 压缩路径下的文件（差不多是四个文件）
 tar -zcf bootchart_log.tgz *
 # 将文件拷贝到电脑上
