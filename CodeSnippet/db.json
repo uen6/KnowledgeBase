@@ -137,7 +137,7 @@
       ],
       "id": "BszPKY2C",
       "createdAt": 1659367456523,
-      "updatedAt": 1666087978012
+      "updatedAt": 1669290154292
     },
     {
       "isDeleted": false,
@@ -196,7 +196,7 @@
       ],
       "id": "WNeFVKgd",
       "createdAt": 1666083270445,
-      "updatedAt": 1666338561721
+      "updatedAt": 1669290104447
     },
     {
       "isDeleted": true,
@@ -476,7 +476,35 @@
       ],
       "id": "aDRJlXbs",
       "createdAt": 1666339220484,
-      "updatedAt": 1666339264369
+      "updatedAt": 1669875862067
+    },
+    {
+      "isDeleted": false,
+      "isFavorites": false,
+      "folderId": "1NX5tDl1",
+      "tagsIds": [],
+      "description": "1. 增加了图标和背景；2. 解除了宽度的限制",
+      "name": "自定义Toast",
+      "content": [
+        {
+          "label": "Toast",
+          "language": "java",
+          "value": "Toast toast = new Toast(this);\r\ntoast.setGravity(Gravity.TOP, 0, 100); //设置toast的显示位置\r\ntoast.setDuration(Toast.LENGTH_SHORT); //设置toast显示的时长\r\nView toastView = LayoutInflater.from(this).inflate(R.layout.my_toast_layout, null);\r\nTextView tv = toastView.findViewById(R.id.message);\r\ntv.setText(\"这是一个toast\");\r\ntoast.setView(toastView);\r\ntoast.show();"
+        },
+        {
+          "label": "my_toast_layout",
+          "language": "xml",
+          "value": "<?xml version=\"1.0\" encoding=\"utf-8\"?>\r\n<LinearLayout xmlns:android=\"http://schemas.android.com/apk/res/android\"\r\n    xmlns:tools=\"http://schemas.android.com/tools\"\r\n    android:layout_width=\"wrap_content\"\r\n    android:layout_height=\"wrap_content\"\r\n    android:background=\"@drawable/window_background\"\r\n    android:gravity=\"center_vertical\"\r\n    android:orientation=\"horizontal\"\r\n    android:padding=\"8dp\">\r\n\r\n    <ImageView\r\n        android:id=\"@+id/icon\"\r\n        android:layout_width=\"24dp\"\r\n        android:layout_height=\"24dp\"\r\n        android:background=\"@drawable/info\" />\r\n\r\n    <!--注意textView中的layout_weight，和LinearLayout一起达到了解除宽度限制的作用，使用其他方式则无效-->\r\n    <TextView\r\n        android:id=\"@+id/message\"\r\n        android:layout_width=\"0dp\"\r\n        android:layout_height=\"wrap_content\"\r\n        android:layout_marginStart=\"8dp\"\r\n        android:layout_weight=\"1\"\r\n        android:includeFontPadding=\"false\"\r\n        android:maxWidth=\"340dp\"\r\n        android:shadowColor=\"#BB000000\"\r\n        android:shadowRadius=\"2.75\"\r\n        android:textColor=\"#fff\"\r\n        android:textSize=\"16sp\"\r\n        tools:text=\"this a toast message\" />\r\n</LinearLayout>"
+        },
+        {
+          "label": "window_background",
+          "language": "xml",
+          "value": "<?xml version=\"1.0\" encoding=\"utf-8\"?>\r\n<shape xmlns:android=\"http://schemas.android.com/apk/res/android\" android:shape=\"rectangle\" >\r\n    <corners android:radius=\"8dp\"/>\r\n    <solid android:color=\"#4a556a\"/>\r\n</shape>"
+        }
+      ],
+      "id": "tdTXSnHP",
+      "createdAt": 1669875846800,
+      "updatedAt": 1669876355730
     }
   ],
   "tags": [
