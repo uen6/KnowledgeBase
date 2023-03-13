@@ -17,6 +17,12 @@ git config --global user.email "your email"
 # 查看用户名和地址
 git config user.name
 git config user.email
+
+# 查看系统config
+git config --system --list
+
+# 查看当前用户（global）配置
+git config --global --list
 ```
 
 ### init

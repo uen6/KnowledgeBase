@@ -236,7 +236,7 @@ adb logcat ActivityManager:I MyApp:D *:S
 ### 硬按键模拟
 
 ```bash
-input keyevent [key值]
+input keyevent [--longpress] [key值]
 ```
 
 | key值 | 对应按键 |

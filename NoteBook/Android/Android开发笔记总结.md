@@ -80,6 +80,49 @@ android:layout_centerVertical="true" //水平垂直居中，适用于RelativeLay
 
 ### 1.2 代码相关
 
+#### 应用保活手段
+
+**1. 让service.onStartCommand返回START_STICKY**
+
+Service被Android系统强制销毁并再次重建的行为依赖于Service的onStartCommand()方法的返回值。
+
+如果返回**START_NOT_STICKY**，表示当Service运行的进程被Android系统强制杀掉之后，不会重新创建该Service。
+
+如果返回**START_STICKY**，表示Service运行的进程被Android系统强制杀掉之后，Android系统会将该Service依然设置为started状态（即运行状态），但是不再保存onStartCommand方法传入的intent对象，然后Android系统会尝试再次重新创建该Service，并执行onStartCommand回调方法，但是onStartCommand回调方法的Intent参数为null，也就是onStartCommand方法虽然会执行但是获取不到intent信息。
+
+如果返回**START_REDELIVER_INTENT**，表示Service运行的进程被Android系统强制杀掉之后，与返回START_STICKY的情况类似，Android系统会将再次重新创建该Service，并执行onStartCommand回调方法，但是不同的是，Android系统会再次将Service在被杀掉之前最后一次传入onStartCommand方法中的Intent再次保留下来并再次传入到重新创建后的Service的onStartCommand方法中，这样我们就能读取到intent参数。
+
+**2. 提高优先级**
+
+**提高Service的优先级**：在AndroidManifest.xml文件中对于intent-filter可以通过android:priority = "1000"这个属性设置最高优先级，1000是最高值，如果数字越小则优先级越低，同时适用于广播。
+
+**提升Service进程的优先级**：当系统进程空间紧张时，会依照优先级自动进行进程的回收。Android将进程分为6个等级，按照优先级由高到低依次为：
+
+| 释义         | name             |
+| ------------ | ---------------- |
+| 前台进程     | foreground_app   |
+| 可视进程     | visible_app      |
+| 次要服务进程 | secondary_server |
+| 后台进程     | hiddena_app      |
+| 内容供应节点 | content_provider |
+| 空进程       | empty_app        |
+
+可以使用startForeground将service放到前台状态，这样低内存时，被杀死的概率会低一些。
+
+**3. 在onDestroy方法里重启Service**
+
+当service走到onDestroy()时，发送一个自定义广播，当收到广播时，重新启动service
+
+**4. 监听系统广播，用来自动唤醒**
+
+比如，ACTION_TIME_TICK，这是Android每隔一分钟发出时间更新的广播。将应用和这个广播绑定，应用就能保证每分钟都被唤醒一次。
+
+**5. 通过拦截异常，进行强制重新唤醒**
+
+通过Thread.UncaughtExceptionHandler捕获app crash的异常，然后AlarmManager定时一段时间后，通过拉起服务的方式保活app
+
+
+
 #### 开机广播
 
 ```xml
@@ -1081,6 +1124,7 @@ https://github.com/amitshekhariitbhu/Android-Debug-Database
 
 ```shell
 adb root
+adb remount
 adb shell
 su #可能需要
 touch /data/bootchart/enabled #创建enabled文件，这是BootChart是否启用的标记文件
@@ -1097,7 +1141,7 @@ rm enabled
 # 压缩路径下的文件（差不多是四个文件）
 tar -zcf bootchart_log.tgz *
 # 将文件拷贝到电脑上
-adb push ...
+adb pull [手机路径] [电脑路径]
 ```
 
 **编译Bootchart**
@@ -1117,7 +1161,7 @@ ant
 **生成Bootchart图片**
 
 ```shell
-java -jar bootchart.jar bootchart_log.taz
+java -jar bootchart.jar bootchart_log.tgz
 ```
 
 **注意：**生成和使用`bootchart.jar`都需要jdk 1.8的环境
