@@ -96,7 +96,7 @@
 | 命令                                       | 作用                                                         |
 | ------------------------------------------ | ------------------------------------------------------------ |
 | **list packages [options] \<stringName\>** | 输出所有软件包，或者，仅输出软件包名称包含 `stringName` 中的文本的软件包<br />`-f`：查看它们的关联文件<br />`-d`：进行过滤以仅显示已停用的软件包<br />`-e`：进行过滤以仅显示已启用的软件包<br />`-s`：进行过滤以仅显示系统软件包<br />`-3`：进行过滤以仅显示第三方软件包<br />`-i`：查看软件包的安装程序<br />`-u`：也包括已卸载的软件包<br />`--user user_id`：要查询的用户空间 |
-| **install [options] path**                 | 将软件包（通过 `path` 指定）安装到系统<br /> `-r`：重新安装现有应用，并保留其数据<br />`-t`：允许安装测试 APK<br />`-i installer_package_name`：指定安装程序软件包名称<br />`--install-location location`：使用以下某个值设置安装位置：<br />    `0`：使用默认安装位置<br />    `1`：在内部设备存储上安装<br />    `2`：在外部介质上安装<br />`-f`：在内部系统内存上安装软件包<br />`-d`：允许版本代码降级<br />`-g`：授予应用清单中列出的所有权限<br />`--fastdeploy`：通过仅更新已更改的 APK 部分来快速更新安装的软件包 |
+| **install [options] path**                 | 将软件包（通过 `path` 指定）安装到系统<br /> `-r`：重新安装现有应用，并保留其数据<br />`-t`：允许安装测试 APK<br />`-i installer_package_name`：指定安装程序软件包名称<br />`--install-location location`：使用以下某个值设置安装位置：<br />    `0`：使用默认安装位置<br />    `1`：在内部设备存储上安装<br />    `2`：在外部介质上安装<br />`-f`：在内部系统内存上安装软件包<br />`-d`：允许版本代码降级<br />**`-g`：授予应用清单中列出的所有权限**<br />`--fastdeploy`：通过仅更新已更改的 APK 部分来快速更新安装的软件包 |
 | **uninstall [options] package**            | 从系统中移除软件包<br />`-k`：移除软件包后保留数据和缓存目录 |
 | path package                               | 输出给定包名的 APK 的路径                                    |
 | clear package                              | 删除与软件包关联的所有数据                                   |
@@ -112,6 +112,8 @@
 | list permission-groups                             | 输出所有已知的权限组                                         |
 | list permissions [options] group                   | 输出所有已知的权限，或者，仅输出 `group` 中的权限<br />`-g`：按组进行整理<br />`-f`：输出所有信息<br />`-s`：简短摘要<br />`-d`：仅列出危险权限<br />`-u`：仅列出用户将看到的权限 |
 | set-permission-enforced permission [true \| false] | 指定是否应强制执行指定权限                                   |
+
+注意：对于某些权限，`grant`命令可能会无法授予，例如：`MANAGE_EXTERNAL_STORAGE`权限。此时可用`adb shell appops set --uid com.company.name MANAGE_EXTERNAL_STORAGE allow`的方式授予
 
 ### 系统信息
 
@@ -333,14 +335,39 @@ input [tap | swipe | draganddrop | press | roll]
 ## dumpsys
 
 ```shell
+# 查看指定应用的相关信息
+dumpsys package com.example.XXX
+
 # 查看顶部activity
-adb shell dumpsys activity top | grep ACTIVITY
+dumpsys activity top | grep ACTIVITY
 
 # 查看正在运行的Services
-adb shell dumpsys activity services [<packagename>]
+dumpsys activity services [<packagename>]
 
 # 获取过去三小时内应用的内存占用情况统计信息（采用简单易懂的格式）
-adb shell dumpsys procstats --hours 3
+dumpsys procstats --hours 3
+```
+
+
+
+
+
+## prop(系统属性)
+
+**注意：**此命令运行需要root环境
+
+| 命令                                | 作用                                                         |
+| ----------------------------------- | ------------------------------------------------------------ |
+| **getprop** \<prop-name\>           | 获取系统属性                                                 |
+| **setprop** \<prop-name\> \<value\> | 修改系统属性                                                 |
+| watchprops                          | 监听系统属性的变化（在此期间，如果系统的属性发生变化则将变化的值显示出来） |
+
+```shell
+# 获取系统时区
+getprop persist.sys.timezone
+
+# 设置系统时区
+setprop persist.sys.timezone Pacific/Midway
 ```
 
 

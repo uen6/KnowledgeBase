@@ -593,6 +593,8 @@ WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS
 
 **android 11文件完整读写权限**
 
+`MANAGE_EXTERNAL_STORAGE`权限无法动态申请，必须跳转到设置手动允许。开发过程中可以使用`adb shell appops set --uid com.company.name MANAGE_EXTERNAL_STORAGE allow`直接授予
+
 ```xml
 写外部存储（分区存储）
 <uses-permission
