@@ -122,15 +122,39 @@
 | list libraries | 输出当前设备支持的所有库 |
 | list features  | 输出系统的所有功能       |
 
-### 用户管理
 
-| 命令                                            | 作用                                                         |
-| ----------------------------------------------- | ------------------------------------------------------------ |
-| **list users**                                  | 输出系统中的所有用户                                         |
-| **disable-user [options] package_or_component** | 具体选项：`--user user_id`：要停用的用户                     |
-| create-user user_name                           | 创建具有给定 `user_name` 的新用户，从而输出该用户的新用户标识符 |
-| remove-user user_id                             | 移除具有给定 `user_id` 的用户，从而删除与该用户关联的所有数据 |
-| get-max-users                                   | 输出设备支持的最大用户数                                     |
+
+
+
+## 多用户
+
+### pm
+
+| 命令                                           | 作用                                                         |
+| ---------------------------------------------- | ------------------------------------------------------------ |
+| **pm list users**                              | 输出系统中的所有用户                                         |
+| pm get-max-users                               | 输出设备支持的最大用户数                                     |
+| pm create-user \<user_name\>                   | 创建具有给定 `user_name` 的新用户，从而输出该用户的新用户标识符 |
+| pm remove-user \<user_id\>                     | 移除具有给定 `user_id` 的用户，从而删除与该用户关联的所有数据 |
+| pm disable-user [options] package_or_component | 具体选项：`--user user_id`：要停用的用户                     |
+| pm enable --user \<userId\>                    |                                                              |
+| pm list packages --user \<userId\>             | 可为特定用户列出软件包<br />`-e` 可列出已启用的软件包<br />`-d` 可列出已停用的软件包 |
+
+### am
+
+| 命令                           | 作用                    |
+| ------------------------------ | ----------------------- |
+| **am switch-user \<user_id\>** | 切换到指定用户          |
+| **am get-current-user**        | 获取当前（前台）用户 ID |
+| am start-user \<user_id\>      | 启动指定用户            |
+
+### 多用户下的安装和卸载
+
+```shell
+adb install --user <userId>
+
+adb uninstall --user <userId> 
+```
 
 
 
@@ -302,7 +326,7 @@ input [tap | swipe | draganddrop | press | roll]
 
 | 命令                        | 作用                                                         |
 | --------------------------- | ------------------------------------------------------------ |
-| -v                          | 0（默认值）只提供启动通知、测试完成和最终结果<br />级别 1 提供有关测试在运行时的更多详细信息，例如发送到您的 Activity 的各个事件<br />级别 2 提供更详细的设置信息，例如已选择或未选择用于测试的 Activity |
+| -v                          | 命令行上的每一个-v都将增加反馈信息的详细级别（最多使用3个-v）<br />级别 0（默认值）只提供启动通知、测试完成和最终结果<br />级别 1 提供有关测试在运行时的更多详细信息，例如发送到您的 Activity 的各个事件<br />级别 2 提供更详细的设置信息，例如已选择或未选择用于测试的 Activity<br />用法：`adb shell "monkey -v -v -v"` |
 | -s \<seed\>                 | 伪随机数生成器的种子值<br />如果您使用相同的种子值重新运行 Monkey，它将会生成相同的事件序列 |
 | --throttle \<milliseconds\> | 在事件之间插入固定的延迟时间。您可以使用此选项减慢 Monkey 速度<br />如果未指定，则不延迟，系统会尽快地生成事件 |
 
@@ -327,6 +351,39 @@ input [tap | swipe | draganddrop | press | roll]
 | --ignore-timeouts            | 通常，当应用遇到任何类型的超时错误（例如“应用无响应”对话框）时，Monkey 将会停止。<br />如果指定此选项，Monkey 会继续向系统发送事件，直到计数完成为止。 |
 | --ignore-security-exceptions | 通常，当应用遇到任何类型的权限错误（例如，如果它尝试启动需要<br />特定权限的 Activity）时，Monkey 将会停止。如果指定此选项，<br />Monkey 会继续向系统发送事件，直到计数完成为止。 |
 | --kill-process-after-error   | 通常，当 Monkey 因出错而停止运行时，出现故障的应用将保持运行状态。<br />设置此选项后，它将会指示系统停止发生错误的进程。注意，在正常（成功）<br />完成情况下，已启动的进程不会停止，并且设备仅会处于最终事件之后的最后状态 |
+
+### 指定文件
+
+| 命令                               | 作用                                   |
+| ---------------------------------- | -------------------------------------- |
+| 1> /sdcard/info.txt                | 表示一般信息输出到/sdcard/info.txt     |
+| 2> /sdcard/error.txt               | 表示错误信息输出到/sdcard/error.txt    |
+| --pkg-whitelist-file \<file_name\> | 指定白名单（白名单：只测试名单内的）   |
+| --pkg-blacklist-file \<file_name\> | 指定黑名单（黑名单：不测试该名单内的） |
+
+### monkey结果分析
+
+在monkey运行结束后，会输出测试结果。其中最后几行如下，代表了运行过程中的一些信息。
+
+```tex
+//显示Monkey 执行失败
+** Monkey aborted due to error.
+
+//执行的事件数量，如果该数字小于你的预定值，说明提前终止了
+Events injected: 6258
+
+//旋转的角度为0
+:Sending rotation degree=0, persist=false
+
+//丢失的事件数量，按键0，提示4，轨迹球0，翻转21，旋转0
+:Dropped: keys=0 pointers=4 trackballs=0 flips=21 rotations=0
+
+//网络状态，移动网络 0ms ，Wi-Fi 0ms ，无网 144ms
+## Network stats: elapsed time=465222ms (0ms mobile, 0ms wifi, 465222ms not connected)
+
+//提示在执行到第8 个事件时出现Crash ，以及所使用的随机种子值
+** System appears to have crashed at event 8 of 10 using seed 1454215444564
+```
 
 
 
