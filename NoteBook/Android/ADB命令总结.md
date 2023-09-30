@@ -391,6 +391,26 @@ Events injected: 6258
 
 ## dumpsys
 
+```
+adb shell dumpsys [options]
+```
+
+| 参数         | 作用                           |
+| ------------ | ------------------------------ |
+| **meminfo**  | **内存**                       |
+| **activity** | **显示所有的activities的信息** |
+| cpuinfo      | CPU                            |
+| gfxinfo      | 帧率                           |
+| display      | 显示                           |
+| power        | 电源                           |
+| battery      | 电池                           |
+| batterystats | 电池状态                       |
+| location     | 位置                           |
+| alarm        | 闹钟                           |
+| account      | accounts                       |
+| window       | 显示键盘，窗口和它们的关系     |
+| wifi         | 显示wifi信息                   |
+
 ```shell
 # 查看指定应用的相关信息
 dumpsys package com.example.XXX
