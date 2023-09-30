@@ -150,12 +150,12 @@
         {
           "label": "子片段 1",
           "language": "java",
-          "value": "import android.app.AlarmManager;\r\nimport android.app.Application;\r\nimport android.app.PendingIntent;\r\nimport android.content.Context;\r\nimport android.content.Intent;\r\nimport android.os.Build;\r\nimport android.util.Log;\r\n\r\n/**\r\n * 捕获程序漏掉的崩溃异常，并重启应用或服务\r\n * <p>\r\n * 在application中使用如下方式调用：\r\n * 重启Activity（android 10+ 需要提供悬浮窗权限）:\r\n * <blockquote>\r\n * Thread.setDefaultUncaughtExceptionHandler(new UnCeHandler(this, Activity.class, UnCeHandler.TYPE_ACTIVITY));\r\n * </blockquote>\r\n * 单独重启Service:\r\n * <blockquote>\r\n * Thread.setDefaultUncaughtExceptionHandler(new UnCeHandler(this, Service.class, UnCeHandler.TYPE_SERVICE));\r\n * </blockquote>\r\n */\r\npublic class UnCeHandler implements Thread.UncaughtExceptionHandler {\r\n    public static final String TAG = \"UnCeHandler\";\r\n    public static final int TYPE_ACTIVITY = 0x0;\r\n    public static final int TYPE_SERVICE = 0x1;\r\n\r\n    private static final long DELAY_CLOSE_TIME = 2_000; //延迟杀掉应用的时间\r\n    private static final long REBOOT_TIME = 1_000; //重启应用的时间\r\n    private final Thread.UncaughtExceptionHandler mDefaultHandler;\r\n    private final Application application;\r\n    private final Context mContext;\r\n    private final Class<?> cls;\r\n    private final int selectType;\r\n\r\n\r\n    // ===================== init ============================== //\r\n    public UnCeHandler(Application application, Class<?> cls, int type) {\r\n        mDefaultHandler = Thread.getDefaultUncaughtExceptionHandler();\r\n        this.application = application;\r\n        this.mContext = application.getApplicationContext();\r\n        this.cls = cls;\r\n        this.selectType = type;\r\n    }\r\n\r\n\r\n    // ===================== Override ============================== //\r\n    @Override\r\n    public void uncaughtException(Thread thread, Throwable ex) {\r\n        if (!handleException(ex) && mDefaultHandler != null) {\r\n            //如果用户没有处理则让系统默认的异常处理器来处理\r\n            mDefaultHandler.uncaughtException(thread, ex);\r\n        } else {\r\n            delayClose(); //延迟指定时间\r\n\r\n            Intent intent = new Intent(mContext, cls);\r\n            PendingIntent restartIntent;\r\n            AlarmManager mgr;\r\n            switch (selectType) {\r\n                //重启service服务\r\n                case TYPE_SERVICE:\r\n                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {\r\n                        /**\r\n                         * PendingIntent.getForegroundService(context, requestCode, intent, flags)\r\n                         *\r\n                         * 第一个参数：连接上下文的context\r\n                         * 第二个参数：是对PendingIntent的描述，请求值不同Intent就不同\r\n                         * 第三个参数：是一个Intent对象，包含跳转目标\r\n                         * 第四个参数有4种状态：\r\n                         *      FLAG_CANCEL_CURRENT: 如果有多个requestCode，则使用最新的PendingIntent对象\r\n                         *      FLAG_NO_CREATE: 如果有相同的PendingIntent存在，直接使用，否则返回null，不会自动创建新的\r\n                         *      FLAG_ONE_SHOT: 该PendingIntent只作用一次，触发后会销毁，再次触发会返回SendIntentException\r\n                         *      FLAG_UPDATE_CURRENT: 如果有一个相同的PendingIntent，则更新之前的数据，使旧的和新的数据一致\r\n                         *      常用的为 FLAG_CANCEL_CURRENT 和 FLAG_UPDATE_CURRENT\r\n                         */\r\n                        restartIntent = PendingIntent.getForegroundService(\r\n                                mContext, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);\r\n                    } else {\r\n                        restartIntent = PendingIntent.getService(\r\n                                mContext, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);\r\n                    }\r\n                    break;\r\n                //重启Activity\r\n                case TYPE_ACTIVITY:\r\n                default:\r\n                    //如果在android 10+上使用，请增加android.permission.SYSTEM_ALERT_WINDOW权限，\r\n                    //否则无法凭空创建出activity\r\n                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);\r\n                    restartIntent = PendingIntent.getActivity(\r\n                            mContext, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);\r\n                    break;\r\n            }\r\n            mgr = (AlarmManager) application.getSystemService(Context.ALARM_SERVICE);\r\n            mgr.set(AlarmManager.RTC, System.currentTimeMillis() + REBOOT_TIME, restartIntent);\r\n            android.os.Process.killProcess(android.os.Process.myPid());\r\n        }\r\n    }\r\n\r\n\r\n    // ===================== function ============================== //\r\n\r\n    /**\r\n     * 延迟指定时间关闭\r\n     */\r\n    private void delayClose() {\r\n        if (DELAY_CLOSE_TIME > 0) {\r\n            try {\r\n                Thread.sleep(DELAY_CLOSE_TIME);\r\n            } catch (InterruptedException e) {\r\n                Log.e(TAG, \"error: \", e);\r\n            }\r\n        }\r\n    }\r\n\r\n    /**\r\n     * 自定义错误处理，收集错误信息 发送错误报告等操作均在此完成\r\n     *\r\n     * @param ex\r\n     * @return true:处理了该异常信息，否则返回false\r\n     */\r\n    private boolean handleException(Throwable ex) {\r\n        if (ex == null) {\r\n            return false;\r\n        }\r\n        //TODO：程序退出前会先运行此函数，可以在此处理异常信息\r\n        // (无法做UI类的操作，因为程序已经运行不下去了，自测Toast会无效，但是log.d有用，文件读写是否有用有待测试)\r\n        Log.d(TAG, \"handleException: \" + ex.toString());\r\n        return true;\r\n    }\r\n\r\n}"
+          "value": "import android.app.AlarmManager;\r\nimport android.app.Application;\r\nimport android.app.PendingIntent;\r\nimport android.content.Context;\r\nimport android.content.Intent;\r\nimport android.os.Build;\r\nimport android.util.Log;\r\n\r\n/**\r\n * 捕获程序漏掉的崩溃异常，并重启应用或服务\r\n * <p>\r\n * <p>\r\n * 在application中使用如下方式调用：\r\n * <p>\r\n * <p>\r\n * 重启Activity（android 10+ 需要提供悬浮窗权限）:\r\n * <blockquote><code>\r\n * Thread.setDefaultUncaughtExceptionHandler(new UnCeHandler(this, Activity.class, UnCeHandler.TYPE_ACTIVITY));\r\n * </code></blockquote>\r\n * <p>\r\n * <p>\r\n * 单独重启Service:\r\n * <blockquote><code>\r\n * Thread.setDefaultUncaughtExceptionHandler(new UnCeHandler(this, Service.class, UnCeHandler.TYPE_SERVICE));\r\n * </code></blockquote>\r\n */\r\npublic class UnCeHandler implements Thread.UncaughtExceptionHandler {\r\n    public static final String TAG = \"UnCeHandler\";\r\n    public static final int TYPE_ACTIVITY = 0x0;\r\n    public static final int TYPE_SERVICE = 0x1;\r\n\r\n    private static final long DELAY_CLOSE_TIME = 2_000; //延迟杀掉应用的时间\r\n    private static final long REBOOT_TIME = 1_000; //重启应用的时间\r\n    private final Thread.UncaughtExceptionHandler mDefaultHandler;\r\n    private final Application application;\r\n    private final Context mContext;\r\n    private final Class<?> cls;\r\n    private final int selectType;\r\n\r\n\r\n    // ===================== init ============================== //\r\n    public UnCeHandler(Application application, Class<?> cls, int type) {\r\n        mDefaultHandler = Thread.getDefaultUncaughtExceptionHandler();\r\n        this.application = application;\r\n        this.mContext = application.getApplicationContext();\r\n        this.cls = cls;\r\n        this.selectType = type;\r\n    }\r\n\r\n\r\n    // ===================== Override ============================== //\r\n    @Override\r\n    public void uncaughtException(Thread thread, Throwable ex) {\r\n        if (!handleException(ex) && mDefaultHandler != null) {\r\n            //如果用户没有处理则让系统默认的异常处理器来处理\r\n            mDefaultHandler.uncaughtException(thread, ex);\r\n        } else {\r\n            delayClose(); //延迟指定时间\r\n\r\n            Intent intent = new Intent(mContext, cls);\r\n            PendingIntent restartIntent;\r\n            AlarmManager mgr;\r\n            switch (selectType) {\r\n                //重启service服务\r\n                case TYPE_SERVICE:\r\n                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {\r\n                        /* PendingIntent.getForegroundService(context, requestCode, intent, flags)\r\n                         *\r\n                         * 第一个参数：连接上下文的context\r\n                         * 第二个参数：是对PendingIntent的描述，请求值不同Intent就不同\r\n                         * 第三个参数：是一个Intent对象，包含跳转目标\r\n                         * 第四个参数有4种状态：\r\n                         *      FLAG_CANCEL_CURRENT: 如果有多个requestCode，则使用最新的PendingIntent对象\r\n                         *      FLAG_NO_CREATE: 如果有相同的PendingIntent存在，直接使用，否则返回null，不会自动创建新的\r\n                         *      FLAG_ONE_SHOT: 该PendingIntent只作用一次，触发后会销毁，再次触发会返回SendIntentException\r\n                         *      FLAG_UPDATE_CURRENT: 如果有一个相同的PendingIntent，则更新之前的数据，使旧的和新的数据一致\r\n                         *      常用的为 FLAG_CANCEL_CURRENT 和 FLAG_UPDATE_CURRENT\r\n                         */\r\n                        restartIntent = PendingIntent.getForegroundService(\r\n                                mContext, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);\r\n                    } else {\r\n                        restartIntent = PendingIntent.getService(\r\n                                mContext, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);\r\n                    }\r\n                    break;\r\n                //重启Activity\r\n                case TYPE_ACTIVITY:\r\n                default:\r\n                    //如果在android 10+上使用，请增加android.permission.SYSTEM_ALERT_WINDOW权限，\r\n                    //否则无法凭空创建出activity\r\n                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);\r\n                    restartIntent = PendingIntent.getActivity(\r\n                            mContext, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);\r\n                    break;\r\n            }\r\n            mgr = (AlarmManager) application.getSystemService(Context.ALARM_SERVICE);\r\n            mgr.set(AlarmManager.RTC, System.currentTimeMillis() + REBOOT_TIME, restartIntent);\r\n            android.os.Process.killProcess(android.os.Process.myPid());\r\n        }\r\n    }\r\n\r\n\r\n    // ===================== function ============================== //\r\n\r\n    /**\r\n     * 延迟指定时间关闭\r\n     */\r\n    private void delayClose() {\r\n        if (DELAY_CLOSE_TIME > 0) {\r\n            try {\r\n                Thread.sleep(DELAY_CLOSE_TIME);\r\n            } catch (InterruptedException e) {\r\n                Log.e(TAG, \"error: \", e);\r\n            }\r\n        }\r\n    }\r\n\r\n    /**\r\n     * 自定义错误处理，收集错误信息 发送错误报告等操作均在此完成\r\n     *\r\n     * @param ex\r\n     * @return true:处理了该异常信息，否则返回false\r\n     */\r\n    private boolean handleException(Throwable ex) {\r\n        if (ex == null) {\r\n            return false;\r\n        }\r\n        //TODO：程序退出前会先运行此函数，可以在此处理异常信息\r\n        // (无法做UI类的操作，因为程序已经运行不下去了，自测Toast会无效，但是log.d有用，文件读写是否有用有待测试)\r\n        Log.d(TAG, \"handleException: \" + ex.toString());\r\n        return true;\r\n    }\r\n\r\n}"
         }
       ],
       "id": "lOj7773n",
       "createdAt": 1666083201819,
-      "updatedAt": 1683874561602
+      "updatedAt": 1685331144222
     },
     {
       "isDeleted": false,
@@ -328,11 +328,16 @@
           "label": "unzipFile",
           "language": "java",
           "value": "/**\n * 将zipFile文件解压到folderPath目录下。\n * <p>\n * 注意：1.解压操作应放到子线程中去运行； 2.不支持含有中文的压缩包\n *\n * @param zipFile    zip文件\n * @param folderPath 解压到的地址\n */\npublic static void unzipFile(File zipFile, String folderPath) throws IOException {\n    Log.i(TAG, \"unzipFile: zipFile=\" + zipFile + \", folderPath=\" + folderPath);\n    if (zipFile == null || folderPath == null) return;\n    if (!zipFile.isFile() || !zipFile.getName().endsWith(\".zip\")) return; //检测zipFile是否合规\n\n    ZipEntry zipEntry;\n    byte[] buffer = new byte[10240];\n    ZipFile zip = new ZipFile(zipFile); //读取一个zip文件\n    Enumeration<?> entries = zip.entries(); //返回zip文件中的枚举\n\n    while (entries.hasMoreElements()) {\n        zipEntry = (ZipEntry) entries.nextElement();\n        Log.d(TAG, \"unzipFile: zipEntry.getName()=\" + zipEntry.getName());\n        File f = new File(folderPath + zipEntry.getName());\n\n        //检测文件的父目录。如果不存在，就创建一个\n        //此处代码的用处有两个：\n        // 1.如果folderPath指向的地址不存在，将会先创建出来。\n        // 2.在某些zip文件上，entries.nextElement()可能会直接返回目录树深处的文件路径，且不再返回其父目录的文件夹名称。\n        //   例如直接返回：aa/bb/1.txt，而不是按照：aa/  aa/bb/  aa/bb/1.txt 的格式返回。\n        //   在这种特殊的情况下如果不判断其父路径是否已创建，后面的创建文件环节将会因父路径不存在而报错。\n        File parentPath = new File(f.getParent() + File.separator);\n        if (!parentPath.exists()) {\n            Log.d(TAG, \"unzipFile: path=\" + parentPath.getPath() + \", mkdirs=\" + parentPath.mkdirs());\n        }\n\n        //创建压缩包中的目录或文件\n        if (zipEntry.isDirectory()) {\n            Log.d(TAG, \"unzipFile: path=\" + f.getPath() + \", mkdir=\" + f.mkdir());\n        } else {\n            Log.i(TAG, \"unzipFile: try unzip file to = \" + f.getPath());\n            InputStream input = new BufferedInputStream(zip.getInputStream(zipEntry)); //来自zip的输入流\n            OutputStream output = new BufferedOutputStream(new FileOutputStream(f)); //指定路径的输出流\n            int readLen;\n            while ((readLen = input.read(buffer)) != -1) {\n                output.write(buffer, 0, readLen);\n            }\n            input.close();\n            output.close();\n        }\n    }\n    zip.close();\n}"
+        },
+        {
+          "label": "other",
+          "language": "java",
+          "value": "/**\r\n * 获取zip文件解压后的大小（计算文件大小并不耗时，不用放到子线程中）\r\n *\r\n * @param zipFilePath String path\r\n * @return 返回大小以B为单位的数字\r\n */\r\npublic long getZipTrueSize(String zipFilePath) {\r\n    Log.d(TAG, \"getZipTrueSize()\" + \", filePath=\" + zipFilePath);\r\n    long size = 0;\r\n    if (zipFilePath == null || !zipFilePath.endsWith(\".zip\")) {\r\n        Log.e(TAG, \"getZipTrueSize: not a zip file !!\");\r\n        return size; //not zip file path, return\r\n    }\r\n    try (ZipFile zipFile = new ZipFile(zipFilePath)) {\r\n        Enumeration<? extends ZipEntry> en = zipFile.entries();\r\n        while (en.hasMoreElements()) size += en.nextElement().getSize();\r\n    } catch (IOException e) {\r\n        e.printStackTrace();\r\n    }\r\n    Log.d(TAG, \"getZipTrueSize: \" + size + \" (Byte)\");\r\n    return size; //Byte大小\r\n}"
         }
       ],
       "id": "INC3bpjL",
       "createdAt": 1666085036032,
-      "updatedAt": 1683874654538
+      "updatedAt": 1694420924834
     },
     {
       "isDeleted": false,
@@ -510,6 +515,132 @@
       "id": "tdTXSnHP",
       "createdAt": 1669875846800,
       "updatedAt": 1669876355730
+    },
+    {
+      "isDeleted": true,
+      "isFavorites": false,
+      "folderId": "XVnzjXNQ",
+      "tagsIds": [],
+      "description": "将单个文件拷贝到指定目录下",
+      "name": "copyFile",
+      "content": [
+        {
+          "label": "子片段 1",
+          "language": "java",
+          "value": "/**\r\n * 将单个文件复制到指定路径下，新文件使用原来的文件名。如果目的路径下存在相同名称的文件，将会进行覆盖操作。 <p>\r\n * <p>\r\n * 此方法适用于api >= 26，如果想适配26以下，可以将 {@code Files.copy(Path, Path)}\r\n * 替换成 {@code FileUtils.copy(File, File)} <p>\r\n * 如果copy过程中涉及的路径没有访问权限，会报AccessDeniedException <p>\r\n * <p>\r\n * 注意：{@code copyFile(file, destination)} 应放到子线程中去运行。 <p>\r\n *\r\n * @param file        一个存在的文件\r\n * @param destination 拷贝的目的路径，如果路径不存在，会尝试去创建\r\n * @return true：拷贝成功； false：拷贝失败\r\n */\r\n@RequiresApi(api = Build.VERSION_CODES.O)\r\npublic boolean copyFile(File file, String destination) {\r\n    Log.i(TAG, \"copyFile: file=\" + file.getPath() + \", destination=\" + destination);\r\n    if (file == null || !file.isFile()) return false;\r\n\r\n    try {\r\n        //检测目的地址是否存在，没有就创建一个\r\n        File dest = new File(destination);\r\n        if (!dest.exists()) Log.d(TAG, \"copyFile: mkdirs=\" + dest.mkdirs());\r\n\r\n        //file copy to destFile\r\n        File destFile = new File(dest.getPath() + File.pathSeparator + file.getName());\r\n        Log.d(TAG, \"copyFile: destFile=\" + destFile.getPath());\r\n        Files.copy(file.toPath(), destFile.toPath(), StandardCopyOption.REPLACE_EXISTING);\r\n\r\n    } catch (IOException e) {\r\n        e.printStackTrace();\r\n        return false;\r\n    }\r\n    return true;\r\n}"
+        }
+      ],
+      "id": "SyloGKCC",
+      "createdAt": 1686114803311,
+      "updatedAt": 1691482808848
+    },
+    {
+      "isDeleted": false,
+      "isFavorites": false,
+      "folderId": "XVnzjXNQ",
+      "tagsIds": [],
+      "description": "获取json的内容，并将其转成Map",
+      "name": "getJsonFileInfo",
+      "content": [
+        {
+          "label": "子片段 1",
+          "language": "java",
+          "value": "/**\r\n * 获取json的内容，并将其转成Map。<p>\r\n * 注意：如果value的值返回null，存储到Map中时会用\"FF\"做value。<p>\r\n *\r\n * @param jsonFile json文件\r\n * @return 如果json格式转换成功，返回一个Map；如果过程存在错误，则返回null\r\n */\r\npublic Map<String, String> getJsonFileInfo(File jsonFile) {\r\n    if (!jsonFile.exists() || !jsonFile.isFile()) {\r\n        Log.e(TAG, jsonFile.getName() + \"  not exist or not a file!\");\r\n        return null;\r\n    }\r\n    //读取文件内容\r\n    StringBuilder content = new StringBuilder();\r\n    try (InputStream inStream = new FileInputStream(jsonFile);\r\n         InputStreamReader inReader = new InputStreamReader(inStream);\r\n         BufferedReader buffReader = new BufferedReader(inReader)) {\r\n        for (String line; (line = buffReader.readLine()) != null; ) {\r\n            content.append(line).append(\"\\n\");\r\n        }\r\n        Log.i(TAG, \"getJsonFileInfo: json file content= \" + content.toString());\r\n    } catch (IOException e) {\r\n        e.printStackTrace();\r\n        return null; //如果出现异常，则终止\r\n    }\r\n    //文件内容转成json，然后再格式化成map\r\n    Map<String, String> map = new LinkedHashMap<>(); //LinkedHashMap可保证插入的顺序和输出的顺序一致\r\n    try {\r\n        JSONObject json = new JSONObject(content.toString());\r\n        Iterator<String> iterator = json.keys();\r\n        while (iterator.hasNext()) {\r\n            String jsonKey = iterator.next();\r\n            map.put(jsonKey, json.optString(jsonKey, \"FF\")); //如果optString获取不到内容，则用\"FF\"来替代\r\n        }\r\n        Log.i(TAG, \"getJsonFileInfo: map= \" + map.toString());\r\n    } catch (JSONException e) {\r\n        e.printStackTrace();\r\n        return null; //如果出现异常，则终止\r\n    }\r\n    return map;\r\n}"
+        }
+      ],
+      "id": "ftO_8JCj",
+      "createdAt": 1691482001922,
+      "updatedAt": 1691482063216
+    },
+    {
+      "isDeleted": true,
+      "isFavorites": false,
+      "folderId": "XVnzjXNQ",
+      "tagsIds": [],
+      "description": "获得文件的MD5",
+      "name": "getMD5",
+      "content": [
+        {
+          "label": "子片段 1",
+          "language": "java",
+          "value": "/**\r\n * 获得文件的md5值。md5计算的时间与文件大小和设备性能挂钩，如果计算md5的文件较大，请放在线程中执行。\r\n *\r\n * @param f a file\r\n * @return md5 or \"\"\r\n */\r\npublic static String getMD5(File f) {\r\n    BigInteger bi = null;\r\n    try {\r\n        MessageDigest md = MessageDigest.getInstance(\"MD5\");\r\n        FileInputStream fis = new FileInputStream(f);\r\n        int len;\r\n        byte[] buffer = new byte[8192];\r\n        while ((len = fis.read(buffer)) != -1) {\r\n            md.update(buffer, 0, len);\r\n        }\r\n        fis.close();\r\n        byte[] b = md.digest();\r\n        bi = new BigInteger(1, b);\r\n    } catch (NoSuchAlgorithmException | IOException e) {\r\n        e.printStackTrace();\r\n    }\r\n    if (bi != null)\r\n        return bi.toString(16);\r\n    else\r\n        return \"\";\r\n}"
+        }
+      ],
+      "id": "xt33b0TM",
+      "createdAt": 1691482086266,
+      "updatedAt": 1691482786239
+    },
+    {
+      "isDeleted": false,
+      "isFavorites": false,
+      "folderId": "XVnzjXNQ",
+      "tagsIds": [],
+      "description": "检测是否是快速点击",
+      "name": "isFastClick",
+      "content": [
+        {
+          "label": "子片段 1",
+          "language": "java",
+          "value": "private static long lastClickTime = -1;\r\n/**\r\n * 检测是否是快速点击\r\n *\r\n * @param fastClickTime 快速点击的限制时间，单位：毫秒\r\n * @return true：快速点击\r\n */\r\npublic synchronized static boolean isFastClick(int fastClickTime) {\r\n    long time = SystemClock.elapsedRealtime();\r\n    if (lastClickTime == -1) {\r\n        lastClickTime = time;\r\n        PFLog.d(TAG, \"isFastClick = false\");\r\n        return false;\r\n    }\r\n    if ((time - lastClickTime) < fastClickTime) {\r\n        PFLog.d(TAG, \"isFastClick = true\");\r\n        return true;\r\n    } else {\r\n        lastClickTime = time;\r\n        PFLog.d(TAG, \"isFastClick = false\");\r\n        return false;\r\n    }\r\n}"
+        }
+      ],
+      "id": "PI9cd3uq",
+      "createdAt": 1691482219647,
+      "updatedAt": 1691482324215
+    },
+    {
+      "isDeleted": true,
+      "isFavorites": false,
+      "folderId": "XVnzjXNQ",
+      "tagsIds": [],
+      "description": null,
+      "name": "grantFilePermissions",
+      "content": [
+        {
+          "label": "子片段 1",
+          "language": "java",
+          "value": ""
+        }
+      ],
+      "id": "lR5_Sw5n",
+      "createdAt": 1691482540876,
+      "updatedAt": 1691482618218
+    },
+    {
+      "isDeleted": false,
+      "isFavorites": false,
+      "folderId": "9oVt2TRO",
+      "tagsIds": [],
+      "description": "文件操作类",
+      "name": "FileUtil",
+      "content": [
+        {
+          "label": "子片段 1",
+          "language": "java",
+          "value": "/**\r\n * 文件操作类\r\n */\r\npublic class FileUtil {\r\n    private final static String TAG = \"FileUtil\";\r\n    \r\n    /**\r\n     * 获得文件的md5值。md5计算的时间与文件大小和设备性能挂钩，如果计算md5的文件较大，请放在线程中执行。\r\n     *\r\n     * @param f a file\r\n     * @return md5 or \"\"\r\n     */\r\n    public static String getMD5(File f) {\r\n        BigInteger bi = null;\r\n        try {\r\n            MessageDigest md = MessageDigest.getInstance(\"MD5\");\r\n            FileInputStream fis = new FileInputStream(f);\r\n            int len;\r\n            byte[] buffer = new byte[8192];\r\n            while ((len = fis.read(buffer)) != -1) {\r\n                md.update(buffer, 0, len);\r\n            }\r\n            fis.close();\r\n            byte[] b = md.digest();\r\n            bi = new BigInteger(1, b);\r\n        } catch (NoSuchAlgorithmException | IOException e) {\r\n            e.printStackTrace();\r\n        }\r\n        if (bi != null)\r\n            return bi.toString(16);\r\n        else\r\n            return \"\";\r\n    }\r\n    \r\n    /**\r\n     * 将单个文件复制到指定路径下，新文件使用原来的文件名。如果目的路径下存在相同名称的文件，将会进行覆盖操作。 <p>\r\n     * <p>\r\n     * 此方法适用于api >= 26，如果想适配26以下，可以将 {@code Files.copy(Path, Path, options)}\r\n     * 替换成 {@code FileUtils.copy(File, File)} <p>\r\n     * 如果copy过程中涉及的路径没有访问权限，会报AccessDeniedException <p>\r\n     * <p>\r\n     * 注意：{@code copyFile(file, destination)} 应放到子线程中去运行。 <p>\r\n     *\r\n     * @param file        一个存在的文件\r\n     * @param destination 拷贝的目的路径，如果路径不存在，会尝试去创建\r\n     * @return true：拷贝成功； false：拷贝失败\r\n     */\r\n    public static boolean copyFile(File file, String destination) {\r\n        Log.i(TAG, \"copyFile: file=\" + file.getPath() + \", destination=\" + destination);\r\n        if (!file.isFile()) return false;\r\n\r\n        try {\r\n            //检测目的地址是否存在，没有就创建一个\r\n            File dest = new File(destination);\r\n            if (!dest.exists()) Log.d(TAG, \"copyFile: mkdirs=\" + dest.mkdirs());\r\n\r\n            //file copy to destFile\r\n            File destFile = new File(dest.getPath() + File.separator + file.getName());\r\n            Log.d(TAG, \"copyFile: destFile=\" + destFile.getPath());\r\n            Files.copy(file.toPath(), destFile.toPath(), StandardCopyOption.REPLACE_EXISTING);\r\n\r\n        } catch (IOException e) {\r\n            e.printStackTrace();\r\n            return false;\r\n        }\r\n        Log.i(TAG, \"copyFile: return true\");\r\n        return true;\r\n    }\r\n    \r\n    /**\r\n     * 给指定的文件或文件夹赋予权限\r\n     *\r\n     * @param f 文件 or 文件夹\r\n     */\r\n    @SuppressLint({\"SetWorldReadable\", \"SetWorldWritable\"})\r\n    public static void grantFilePermissions(File f) {\r\n        if (f.exists()) {\r\n            Log.i(TAG, \"grantFilePermissions: file=\" + f.getName()\r\n                    + \", setReadable=\" + f.setReadable(true, false)\r\n                    + \", setWritable=\" + f.setWritable(true, false)\r\n                    + \", setExecutable=\" + f.setExecutable(true, false));\r\n        }\r\n    }\r\n\r\n    /**\r\n     * 获取文件夹的大小，单位MB\r\n     *\r\n     * @param folder a folder File\r\n     */\r\n    public static long getFolderSize_MB(File folder) {\r\n        long size = 0;\r\n        if (!folder.exists()) return size;\r\n        File[] fileList = folder.listFiles();\r\n        if (fileList == null || fileList.length == 0) return size;\r\n\r\n        for (File f : fileList) {\r\n            //如果是文件，直接加到size上；如果是文件夹，递归里面的文件\r\n            size += f.isDirectory() ? getFolderSize_MB(f) : f.length();\r\n        }\r\n        return (size >> 20); //等同于：size / 1024 / 1024\r\n    }\r\n\r\n    /**\r\n     * 获取外部存储可用大小\r\n     *\r\n     * @param folder 一个文件路径，通过此路径可判断当前存储区的剩余空间\r\n     */\r\n    public static long getStorageAvailableSize(File folder) {\r\n        StatFs fs = new StatFs(folder.getPath());\r\n        long count = fs.getAvailableBlocksLong(); //获取可用块数\r\n        long size = fs.getBlockSizeLong(); //获取单个块的大小\r\n        return (count * size) >> 20; //等同于：count * size / 1024 / 1024;\r\n    }\r\n\r\n    /**\r\n     * 删除文件夹中创建时间最早的文件。由于日志文件名中记录了开机次数，\r\n     * 所以删除文件时会将开机次数最小的一批提取出来，然后从这批中删除时间最早的文件。\r\n     *\r\n     * @param folder 要删除的文件夹\r\n     */\r\n    public static void deleteEarliestFileInFolder(File folder) {\r\n        if (!folder.isDirectory()) {\r\n            Log.w(TAG, \"deleteEarliestFileInFolder: folder not a directory! folder=\" + folder);\r\n            return; //不是目录，退出\r\n        }\r\n\r\n        File[] files = folder.listFiles();\r\n        if (files == null || files.length <= 1) {\r\n            Log.w(TAG, \"deleteEarliestFileInFolder: folder is null or len <= 1! folder=\" + folder);\r\n            return; //只有一个文件或空目录时，不做删除处理\r\n        }\r\n\r\n        //根据根据最小的开机次数进行筛选\r\n        List<File> delFile = new ArrayList<>();\r\n        int min = Integer.MAX_VALUE;\r\n        for (File file : files) {\r\n            //匹配符合要求的zip文件，例262_2023_05_17_13_24_08.zip\r\n            if (Pattern.matches(\"^(\\\\d+_){6}\\\\d+.zip$\", file.getName())) {\r\n                String str_num = file.getName().split(\"_\")[0]; //262_2023_05_17_13_24_08.zip => 262\r\n                int num = Integer.parseInt(str_num);\r\n                if (min > num) {\r\n                    min = num;\r\n                    delFile.clear(); //如果找到新的最小值，则之前存的都将作废，重新开始存\r\n                }\r\n                if (min == num) delFile.add(file); //如果当前值和最小值一致，加入到list中\r\n            }\r\n        }\r\n        if (delFile.size() < 1) {\r\n            Log.w(TAG, \"deleteEarliestFileInFolder: delFile.size() < 1, no delete\");\r\n            return; //没有筛选到文件，不进行删除\r\n        }\r\n\r\n        //对delFile中的文件日期进行升序排序，小的在第一个\r\n        Collections.sort(delFile, (f1, f2) -> {\r\n            long diff = f1.lastModified() - f2.lastModified();\r\n            return diff > 0 ? 1 : (diff == 0 ? 0 : -1);\r\n        });\r\n        Log.i(TAG, \"deleteFile: \" + delFile.get(0).getName()\r\n                + \"; delete result: \" + delFile.get(0).delete()); //删除最早的文件\r\n    }\r\n}"
+        }
+      ],
+      "id": "6mfx9rLY",
+      "createdAt": 1691482562736,
+      "updatedAt": 1691482762351
+    },
+    {
+      "isDeleted": false,
+      "isFavorites": false,
+      "folderId": "5uOcX0Wd",
+      "tagsIds": [],
+      "description": null,
+      "name": "Handler",
+      "content": [
+        {
+          "label": "子片段 1",
+          "language": "java",
+          "value": "public class MyHandler extends Handler {\r\n    private final String TAG = \"MyHandler\";\r\n    private final WeakReference<Activity> mActivity;\r\n\r\n    public MyHandler(Looper looper) {\r\n        super(looper);\r\n    }\r\n\r\n    public MyHandler(Looper looper, Activity activity) {\r\n        super(looper);\r\n        mActivity = new WeakReference<Activity>(activity); //获取弱引用Activity对象\r\n    }\r\n\r\n    @Override\r\n    public void handleMessage(Message msg) {\r\n        super.handleMessage(msg);\r\n        Log.i(TAG, \"MyHandler: \" + msg.what);\r\n        switch (msg.what) {\r\n            //????\r\n            case XXX:\r\n                if (mActivity.get() != null) {\r\n                    //利用弱引用来获取UI控件，不会对回收造成影响\r\n                    mActivity.get().mStateTv.setText(\"state change\");\r\n                }\r\n                break;\r\n\r\n            default:\r\n                Log.w(TAG, \"Unknown message, msg.what = \" + msg.what);\r\n                break;\r\n        }\r\n    }\r\n}"
+        }
+      ],
+      "id": "8rVbNBQO",
+      "createdAt": 1695833321541,
+      "updatedAt": 1695864455936
     }
   ],
   "tags": [
@@ -524,6 +655,18 @@
       "id": "KhvDhBKl",
       "createdAt": 1666083468202,
       "updatedAt": 1666083468202
+    },
+    {
+      "name": "将单个文件拷贝到指定目录下",
+      "id": "tncgmYNO",
+      "createdAt": 1686115110553,
+      "updatedAt": 1686115110553
+    },
+    {
+      "name": "获取json的内容，并将其转成Map",
+      "id": "v8NRPVPU",
+      "createdAt": 1691482022768,
+      "updatedAt": 1691482022768
     }
   ]
 }
